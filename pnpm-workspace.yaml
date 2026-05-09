@@ -11,7 +11,7 @@ catalog:
   "@atlaskit/pragmatic-drag-and-drop": 1.7.7
   "@capacitor/android": ^7.4.4
   "@capacitor/app-launcher": ^7.0.2
-  "@capacitor/app": ^7.1.0
+  "@capacitor/app": ^8.1.0
   "@capacitor/cli": ^7.4.4
   "@capacitor/core": ^7.4.4
   "@capacitor/haptics": ^7.0.2
