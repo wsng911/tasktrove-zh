@@ -32,7 +32,7 @@ catalog:
   "@ionic/react": ^8.7.9
   "@khmyznikov/pwa-install": ^0.5.8
   "@next/bundle-analyzer": ^16.0.10
-  "@next/eslint-plugin-next": ^16.0.10
+  "@next/eslint-plugin-next": ^16.2.6
   "@radix-ui/react-accordion": ^1.2.12
   "@radix-ui/react-alert-dialog": ^1.1.15
   "@radix-ui/react-aspect-ratio": ^1.1.7
