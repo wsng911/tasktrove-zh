@@ -1,0 +1,53 @@
+{
+  "emptyStates": {
+    "all": {
+      "description": "이 보기는 모든 프로젝트의 모든 작업을 보여줍니다. TaskTrove를 시작하려면 첫 번째 작업을 만드세요.",
+      "title": "작업을 찾을 수 없습니다"
+    },
+    "analytics": {
+      "description": "생산성 및 작업 완료 패턴을 추적하세요.",
+      "title": "분석 대시보드"
+    },
+    "completed": {
+      "description": "완료한 작업이 여기에 나타납니다. 몇 가지 작업을 완료하여 진행 상황을 보고 성공을 축하하세요!",
+      "title": "아직 완료된 작업이 없습니다"
+    },
+    "fallback": {
+      "description": "시작하려면 첫 번째 작업을 만드세요.",
+      "title": "작업을 찾을 수 없습니다"
+    },
+    "inbox": {
+      "description": "이것은 모든 새 작업의 기본 수집 지점입니다. 프로젝트를 지정하지 않고 작업을 만들면 여기에 저장됩니다.",
+      "title": "인박스가 비어 있습니다"
+    },
+    "label": {
+      "description": "이 라벨로 태그된 작업이 여기에 나타납니다. 라벨을 사용하여 작업을 분류하고 관련 작업을 빠르게 찾으세요.",
+      "title": "{{labelName}} 라벨이 있는 작업 없음"
+    },
+    "project": {
+      "description": "이 프로젝트는 비어 있습니다. 작업을 추가하여 작업을 정리하고 특정 목표에 대한 진행 상황을 추적하세요.",
+      "title": "{{projectName}}에 작업 없음"
+    },
+    "search": {
+      "description": "제목, 설명 또는 라벨로 작업을 찾으세요.",
+      "title": "검색 결과"
+    },
+    "today": {
+      "description": "오늘 마감일이 있는 작업이 여기에 나타납니다. 작업에 마감일을 설정하여 일일 목표를 추적하세요.",
+      "title": "오늘 예정된 작업 없음"
+    },
+    "upcoming": {
+      "description": "미래 마감일이 있는 작업이 여기에 나타나 다음에 올 내용을 계획하고 준비하는 데 도움이 됩니다.",
+      "title": "예정된 작업 없음"
+    }
+  },
+  "mainNav": {
+    "allTasks": "모든 작업",
+    "calendar": "달력",
+    "completed": "완료됨",
+    "habits": "습관",
+    "inbox": "인박스",
+    "today": "오늘",
+    "upcoming": "예정됨"
+  }
+}

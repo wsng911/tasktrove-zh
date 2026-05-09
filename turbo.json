@@ -1,0 +1,49 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["transit"]
+    },
+    "typecheck": {
+      "dependsOn": ["transit"]
+    },
+    "test": {
+      "dependsOn": ["transit"]
+    },
+    "test:changed": {
+      "cache": false
+    },
+    "test:file": {
+      "cache": false
+    },
+    "test:coverage": {
+      "dependsOn": ["^test:coverage"],
+      "outputs": ["coverage/**"]
+    },
+    "check": {
+      "dependsOn": ["transit"]
+    }
+  },
+  "globalPassThroughEnv": [
+    "PORT",
+    "NODE_ENV",
+    "AUTH_SECRET",
+    "DEBUG",
+    "ENABLE_HALLOWEEN_THEME",
+    "VITEST",
+    "NEXT_RUNTIME",
+    "SHOW_DEBUG_BADGE"
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "appearance": {
+    "colorScheme": {
+      "description": "Selecione claro, escuro ou seguir preferência do sistema",
+      "label": "Escolha seu esquema de cores",
+      "title": "Esquema de Cores"
+    }
+  },
+  "data": {
+    "autoBackup": {
+      "backupTime": {
+        "description": "Escolher horário para backups automáticos",
+        "label": "Horário do backup"
+      },
+      "description": "Criar automaticamente arquivos de backup de tarefas e projetos.",
+      "dockerNotice": {
+        "description": "Em um ambiente Docker, os arquivos de backup são armazenados em /app/data/backups dentro do container. Certifique-se de montar um volume para persistir os backups.",
+        "guide": "Ver guia do Docker",
+        "title": "Ambiente Docker"
+      },
+      "enable": {
+        "description": "Fazer backup dos seus dados automaticamente de forma periódica",
+        "label": "Habilitar backups automáticos"
+      },
+      "manualBackup": {
+        "button": "Backup manual agora"
+      },
+      "maxBackups": {
+        "description": "Os backups mais antigos serão removidos automaticamente",
+        "label": "Máximo de backups a manter",
+        "noLimit": "Sem limite"
+      },
+      "title": "Backup automático"
+    },
+    "taskImport": {
+      "description": "Importar tarefas de outras aplicações de gerenciamento de tarefas.",
+      "step1": {
+        "description": "Clique em um serviço de gerenciamento de tarefas abaixo para abrir o assistente de importação. Siga as instruções para exportar e converter seus dados para o formato TaskTrove.",
+        "title": "Passo 1: Exportar seus dados"
+      },
+      "step2": {
+        "description": "Após usar o assistente de importação acima, você baixará um arquivo JSON. Faça upload desse arquivo aqui para importar suas tarefas, projetos e etiquetas para o TaskTrove.",
+        "important": {
+          "description": "Faça upload apenas do arquivo JSON baixado do assistente de importação. Exportações regulares de outras aplicações não funcionarão.",
+          "title": "Importante:"
+        },
+        "title": "Passo 2: Fazer upload do arquivo convertido"
+      },
+      "title": "Importação de tarefas",
+      "upload": {
+        "button": "Fazer upload do arquivo JSON",
+        "error": {
+          "title": "Erro no upload"
+        },
+        "success": {
+          "alreadyExisted": "{{items}} já existiam",
+          "imported": "{{items}} importados",
+          "labels_one": "{{count}} etiqueta",
+          "labels_many": "{{count}} etiquetas",
+          "labels_other": "{{count}} etiquetas",
+          "noNewItems": "Nenhum item novo",
+          "projects_one": "{{count}} projeto",
+          "projects_many": "{{count}} projetos",
+          "projects_other": "{{count}} projetos",
+          "tasks_one": "{{count}} tarefa",
+          "tasks_many": "{{count}} tarefas",
+          "tasks_other": "{{count}} tarefas",
+          "title": "Importação bem-sucedida!"
+        },
+        "uploading": "Fazendo upload..."
+      }
+    }
+  },
+  "general": {
+    "apiToken": {
+      "description": "Gere um token de API para acesso programático. Use este token no cabeçalho Authorization como 'Bearer SEU_TOKEN' para autenticar requisições de API.",
+      "generate": "Gerar Token",
+      "label": "Token de API",
+      "regenerate": "Regenerar Token",
+      "revoke": "Revogar Token",
+      "title": "API",
+      "viewDocs": "Ver Documentação da API"
+    },
+    "audio": {
+      "soundEffects": {
+        "description": "Reproduzir sons para completar tarefas, notificações e outras interações",
+        "label": "Efeitos sonoros"
+      },
+      "title": "Áudio"
+    },
+    "defaultPage": {
+      "description": "Escolher a página a ser exibida ao abrir o TaskTrove pela primeira vez",
+      "label": "Mostrar ao abrir o TaskTrove",
+      "title": "Página padrão"
+    },
+    "language": {
+      "description": "Selecionar o idioma de exibição da aplicação",
+      "label": "Idioma",
+      "title": "Idioma"
+    },
+    "links": {
+      "autoConvert": {
+        "description": "Converter automaticamente URLs em títulos de tarefas para links clicáveis",
+        "label": "Converter automaticamente URLs para links"
+      },
+      "title": "Links"
+    },
+    "popovers": {
+      "hoverOpen": {
+        "description": "Permitir que os popovers sejam abertos ao passar o mouse, além do clique",
+        "label": "Abertura ao passar o mouse"
+      },
+      "title": "Popovers"
+    },
+    "startView": {
+      "all": {
+        "description": "Ver todas as suas tarefas em um lugar",
+        "label": "Todas as tarefas"
+      },
+      "completed": {
+        "description": "Revisar tarefas concluídas",
+        "label": "Concluídas"
+      },
+      "inbox": {
+        "description": "Começar com tarefas não organizadas",
+        "label": "Caixa de entrada"
+      },
+      "lastViewed": {
+        "description": "Retornar à sua última página ativa",
+        "label": "Última visualizada"
+      },
+      "today": {
+        "description": "Focar nas tarefas de hoje",
+        "label": "Hoje"
+      },
+      "upcoming": {
+        "description": "Ver o que vem a seguir",
+        "label": "Próximas"
+      }
+    }
+  },
+  "notifications": {
+    "alerts": {
+      "notificationsBlocked": {
+        "manualInstructions": "O navegador não exibiu o diálogo de permissões. Para habilitar as notificações, clique no ícone 🔒 na barra de endereços ou vá para configurações do navegador → Privacidade e segurança → Configurações do site → Notificações, depois atualize a página.",
+        "retryInstructions": "Por favor, primeiro tente o botão \"Tentar novamente\". Se isso não funcionar, você deve habilitar as notificações manualmente nas configurações do seu navegador.",
+        "title": "Notificações bloqueadas"
+      },
+      "secureConnectionRequired": {
+        "description": "As notificações requerem uma conexão segura (HTTPS) ou localhost. Por favor, acesse este site através de HTTPS ou execute-o em localhost para habilitar as notificações.",
+        "title": "Conexão segura necessária"
+      }
+    },
+    "general": {
+      "enableNotifications": {
+        "description": "Ativar ou desativar todas as notificações",
+        "label": "Habilitar notificações"
+      },
+      "requireInteraction": {
+        "description": "As notificações permanecem visíveis até você interagir com elas",
+        "label": "Requer interação"
+      },
+      "title": "Configuração geral"
+    },
+    "permissionStatus": {
+      "blocked": "Bloqueado",
+      "browserNotifications": "Notificações do navegador",
+      "browserSettingsTooltip": "O navegador pode exigir alterações manuais nas configurações",
+      "enable": "Habilitar",
+      "enabled": "Habilitado",
+      "notEnabled": "Não habilitado",
+      "requesting": "Solicitando",
+      "requiresHttps": "As notificações requerem HTTPS",
+      "retry": "Tentar novamente",
+      "retryTooltip": "Tentar solicitar permissão novamente",
+      "testNotification": "Testar notificação",
+      "title": "Status das permissões",
+      "tryAgain": "Tentar novamente"
+    }
+  }
+}

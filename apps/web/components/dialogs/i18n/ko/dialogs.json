@@ -1,0 +1,190 @@
+{
+  "about": {
+    "by": "제작:",
+    "description": "TaskTrove 애플리케이션의 버전 및 개발자 정보",
+    "madeWith": "제작 도구",
+    "sponsorMe": "후원하기",
+    "starOnGitHub": "GitHub에서 별표 주기",
+    "title": "TaskTrove 정보"
+  },
+  "baseDialog": {
+    "buttons": {
+      "add": "{{type}} 추가"
+    },
+    "color": {
+      "label": "색상"
+    },
+    "description": {
+      "label": "설명 (선택사항)",
+      "placeholder": "{{type}}의 설명을 입력하세요"
+    },
+    "name": {
+      "label": "{{type}} 이름",
+      "placeholder": "{{type}} 이름을 입력하세요"
+    },
+    "parent": {
+      "none": "없음 (최상위)",
+      "placeholder": "{{type}} 선택"
+    },
+    "title": "새 {{type}} 추가",
+    "types": {
+      "label": "라벨",
+      "project": "프로젝트",
+      "projectGroup": "프로젝트 그룹",
+      "section": "섹션"
+    }
+  },
+  "common": {
+    "cancel": "취소"
+  },
+  "delete": {
+    "bulk": {
+      "confirm": "삭제",
+      "description_other": "{{count}}개의 항목을 삭제하시겠습니까?",
+      "title": "선택된 항목 삭제"
+    },
+    "default": {
+      "confirm": "삭제",
+      "description": "이 작업을 삭제하시겠습니까?",
+      "title": "작업 삭제"
+    },
+    "group": {
+      "confirm": "삭제",
+      "deleteContainedResources": "이 그룹의 모든 프로젝트와 작업도 삭제",
+      "description": "\"{{- name}}\"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      "title": "그룹 삭제"
+    },
+    "history": {
+      "confirm": "삭제",
+      "description": "모든 기록을 삭제하시겠습니까?",
+      "title": "기록 삭제"
+    },
+    "label": {
+      "confirm": "삭제",
+      "description": "\"{{- name}}\" 라벨을 삭제하시겠습니까?",
+      "title": "라벨 삭제"
+    },
+    "project": {
+      "confirm": "삭제",
+      "deleteContainedResources": "이 프로젝트의 모든 작업도 삭제",
+      "description": "\"{{- name}}\"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      "title": "프로젝트 삭제"
+    },
+    "section": {
+      "confirm": "삭제",
+      "description": "\"{{- name}}\" 섹션을 삭제하시겠습니까?",
+      "title": "섹션 삭제"
+    },
+    "task": {
+      "confirm": "삭제",
+      "description": "\"{{- name}}\" 작업을 삭제하시겠습니까?",
+      "title": "작업 삭제"
+    }
+  },
+  "logout": {
+    "cancel": "취소",
+    "confirm": "로그아웃",
+    "confirmMessage": "정말 로그아웃하시겠습니까? 작업에 액세스하려면 다시 로그인해야 합니다.",
+    "confirmTitle": "로그아웃"
+  },
+  "projectDialog": {
+    "buttons": {
+      "add": "{{type}} 추가"
+    },
+    "color": {
+      "label": "색상"
+    },
+    "group": "그룹",
+    "name": {
+      "label": "{{type}} 이름",
+      "placeholder": "{{type}} 이름을 입력하세요"
+    },
+    "project": "프로젝트",
+    "title": "새 {{type}} 추가",
+    "type": {
+      "label": "유형"
+    }
+  },
+  "quickAdd": {
+    "addingTask": "추가 중",
+    "addTask": "작업 추가",
+    "buttons": {
+      "comments": "댓글",
+      "date": "날짜",
+      "label": "라벨",
+      "priority": "우선순위",
+      "project": "프로젝트",
+      "section": "섹션",
+      "subtasks": "하위 작업"
+    },
+    "copyTitle": "작업 복제",
+    "description": {
+      "placeholder": "설명 또는 메모 추가..."
+    },
+    "smartParsing": {
+      "help": "스마트 파싱은 입력 내용에서 작업 세부사항을 자동으로 감지하고 추출할 수 있는 실험적 기능입니다. 우선순위(P1-P4), 마감일(내일, 다음 주 등), 프로젝트 이름(#프로젝트), 라벨(@라벨), 반복 패턴(매일, 매주)을 인식할 수 있습니다.",
+      "label": "스마트 파싱"
+    },
+    "title": "빠른 추가"
+  },
+  "settings": {
+    "accessibility": {
+      "closeMenu": "메뉴 닫기",
+      "closeSettings": "설정 닫기",
+      "openMenu": "설정 메뉴 열기"
+    },
+    "categories": {
+      "appearance": {
+        "description": "테마, 색상 및 시각적 환경설정",
+        "title": "모양"
+      },
+      "data": {
+        "description": "가져오기/내보내기, 백업",
+        "title": "데이터"
+      },
+      "general": {
+        "description": "기본 페이지, 기본 설정",
+        "title": "일반"
+      },
+      "notifications": {
+        "description": "알림 설정",
+        "title": "알림"
+      }
+    },
+    "description": "TaskTrove 애플리케이션 설정 및 환경설정 구성",
+    "title": "설정"
+  },
+  "unsavedConfirmation": {
+    "confirm": "변경사항 삭제",
+    "description": "저장되지 않은 변경사항이 있습니다. 이 대화상자를 닫으면 변경사항이 손실됩니다. 계속하시겠습니까?",
+    "title": "저장되지 않은 변경사항을 삭제하시겠습니까?"
+  },
+  "userProfile": {
+    "changeAvatar": "아바타 변경",
+    "confirmPassword": {
+      "label": "비밀번호 확인",
+      "mismatch": "비밀번호가 일치하지 않습니다",
+      "placeholder": "비밀번호를 다시 입력하세요"
+    },
+    "errors": {
+      "fileSizeLimit": "아바타 파일 크기는 5MB 미만이어야 합니다",
+      "invalidFileType": "유효한 이미지 파일을 선택하세요",
+      "passwordMismatch": "비밀번호가 일치하지 않습니다",
+      "updateFailed": "프로필 업데이트에 실패했습니다",
+      "usernameRequired": "사용자명이 필요합니다"
+    },
+    "password": {
+      "label": "비밀번호",
+      "placeholder": "현재 비밀번호를 유지하려면 비워두세요"
+    },
+    "removeAvatar": "아바타 제거",
+    "save": "변경사항 저장",
+    "saving": "저장 중...",
+    "title": "프로필 편집",
+    "uploadAvatar": "아바타 업로드",
+    "username": {
+      "label": "사용자명",
+      "placeholder": "사용자명을 입력하세요"
+    }
+  }
+}

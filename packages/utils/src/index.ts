@@ -1,0 +1,163 @@
+/**
+ * @tasktrove/utils - Shared utilities for TaskTrove applications
+ *
+ * Environment-agnostic utilities that work across CLI, mobile, desktop, and web platforms.
+ * All utilities in this package are pure functions with no environment dependencies.
+ */
+
+// Core styling utilities
+export * from "./styling";
+
+// File utilities
+export * from "./file";
+
+// Color utilities
+export * from "./color";
+
+// Time utilities
+export * from "./time";
+export * from "./time-estimation";
+
+// Validation utilities
+export * from "./validation";
+export * from "./origin-validation";
+
+// Routing utilities
+export * from "./routing";
+
+// Group utilities
+export * from "./group-utils";
+
+// Natural language parser
+export * from "./parser-adapter";
+
+// Shared patterns (used by parser for autocomplete/highlighting)
+export * from "./shared-patterns";
+
+// Encryption utilities
+export * from "./encryption";
+
+// Color utilities
+export * from "./color-utils";
+
+// Date filter utilities
+export * from "./date-filter-utils";
+
+// Task date formatter utilities
+export * from "./task-date-formatter";
+
+export * from "./notification";
+
+// Effective due date utilities for auto-rollover recurring tasks
+export * from "./effective-due-date";
+
+// Recurring task processor utilities
+export * from "./recurring-task-processor";
+
+// Object manipulation utilities
+export * from "./object-utils";
+
+// Array operation utilities
+export * from "./array-operations";
+
+// Global store utilities
+export * from "./global-store";
+
+// Version utilities
+export * from "./version";
+
+// Re-export commonly used utilities for convenience
+export { cn } from "./styling";
+export {
+  encodeFileToBase64,
+  encodeFileToDataUrl,
+  AVATAR_DATA_URL_REGEX,
+  SUPPORTED_AVATAR_MIME_TYPES,
+  isValidAvatarDataUrl,
+  parseAvatarDataUrl,
+  isSupportedAvatarMimeType,
+} from "./file";
+export { getContrastColor } from "./color";
+export { safeSetTimeout, MAX_SAFE_TIMEOUT_DELAY } from "./time";
+export { formatTime, getEffectiveEstimation } from "./time-estimation";
+export {
+  shouldTaskBeInInbox,
+  formatZodErrors,
+  normalizeTaskUpdate,
+} from "./validation";
+export { isValidOrigin } from "./origin-validation";
+export {
+  createEntitySlug,
+  createProjectSlug,
+  createLabelSlug,
+  createProjectGroupSlug,
+  createLabelGroupSlug,
+  createSectionSlug,
+  extractIdFromSlug,
+  resolveProject,
+  resolveLabel,
+  isValidProjectId,
+  getApiBasePath,
+} from "./routing";
+export {
+  findGroupById,
+  collectProjectIdsFromGroup,
+  getAllGroupsFlat,
+  resolveGroup,
+} from "./group-utils";
+export {
+  parseEnhancedNaturalLanguage,
+  convertTimeToHHMMSS,
+  getPriorityDisplay,
+  getPriorityBackgroundColor,
+  getDateDisplay,
+  getRecurringDisplay,
+  getTimeDisplay,
+  getDurationDisplay,
+  DATE_SUGGESTIONS,
+  TIME_SUGGESTIONS,
+} from "./parser-adapter";
+export { saltAndHashPassword, verifyPassword } from "./encryption";
+export {
+  getPriorityColor,
+  getPriorityTextColor,
+  getPriorityLabel,
+  getDueDateTextColor,
+  getScheduleIcons,
+} from "./color-utils";
+export {
+  getDateRangeForPreset,
+  matchesDueDateFilter,
+  getPresetLabel,
+  getCustomRangeLabel,
+  getPresetTaskCounts,
+} from "./date-filter-utils";
+export type { DueDatePreset, DateRange } from "./date-filter-utils";
+export {
+  formatTaskDateTime,
+  formatDateDisplay,
+  formatDateTimeDisplay,
+  formatMonthLabel,
+  formatMonthYearLabel,
+  formatWeekdayLabel,
+  formatDayOfMonthLabel,
+  formatTimeShort,
+  formatTaskDateTimeBadge,
+  formatTimeOfDay,
+  isTaskOverdue,
+  getTaskDueDateStatus,
+} from "./task-date-formatter";
+export type {
+  TaskDateFormat,
+  TaskDateFormatOptions,
+  DateDisplayOptions,
+} from "./task-date-formatter";
+export { clearNullValues, mergeDeep } from "./object-utils";
+export type { WithoutNull } from "./object-utils";
+export {
+  reorderInArray,
+  removeFromArray,
+  insertAtIndex,
+  moveItemBetweenArrays,
+  moveItemToIndex,
+} from "./array-operations";

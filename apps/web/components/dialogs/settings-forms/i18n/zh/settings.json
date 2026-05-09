@@ -1,0 +1,175 @@
+{
+  "appearance": {
+    "colorScheme": {
+      "description": "选择亮色、暗色或跟随系统偏好",
+      "label": "选择您的配色方案",
+      "title": "配色方案"
+    }
+  },
+  "data": {
+    "autoBackup": {
+      "backupTime": {
+        "description": "选择自动备份的时间",
+        "label": "备份时间"
+      },
+      "description": "自动创建任务和项目的备份文件。",
+      "dockerNotice": {
+        "description": "在 Docker 环境中，备份文件保存在容器内的 /app/data/backups 目录。确保挂载卷以持久化备份。",
+        "guide": "查看备份设置指南",
+        "title": "Docker 用户："
+      },
+      "enable": {
+        "description": "定期自动备份您的数据",
+        "label": "启用自动备份"
+      },
+      "manualBackup": {
+        "button": "立即手动备份"
+      },
+      "maxBackups": {
+        "description": "旧备份将被自动删除",
+        "label": "保留备份的最大数量",
+        "noLimit": "无限制"
+      },
+      "title": "自动备份"
+    },
+    "taskImport": {
+      "description": "从其他任务管理应用程序导入任务。",
+      "step1": {
+        "description": "点击下方的任务管理服务打开导入助手。按照说明导出并转换您的数据为 TaskTrove 格式。",
+        "title": "步骤 1：导出您的数据"
+      },
+      "step2": {
+        "description": "使用上述导入助手后，您将下载一个 JSON 文件。在此上传该文件以导入您的任务、项目和标签到 TaskTrove。",
+        "important": {
+          "description": "仅上传从导入助手下载的 JSON 文件。其他应用的常规导出文件无法使用。",
+          "title": "重要提示："
+        },
+        "title": "步骤 2：上传转换后的文件"
+      },
+      "title": "任务导入",
+      "upload": {
+        "button": "上传 JSON 文件",
+        "error": {
+          "title": "上传错误"
+        },
+        "success": {
+          "alreadyExisted": "{{items}} 已存在",
+          "imported": "已导入 {{items}}",
+          "labels_other": "{{count}} 个标签",
+          "noNewItems": "没有新项目",
+          "projects_other": "{{count}} 个项目",
+          "tasks_other": "{{count}} 个任务",
+          "title": "导入成功！"
+        },
+        "uploading": "上传中..."
+      }
+    }
+  },
+  "general": {
+    "apiToken": {
+      "description": "生成 API 令牌以进行编程访问。在授权标头中使用此令牌作为 'Bearer YOUR_TOKEN' 来验证 API 请求。",
+      "generate": "生成令牌",
+      "label": "API 令牌",
+      "regenerate": "重新生成令牌",
+      "revoke": "撤销令牌",
+      "title": "API",
+      "viewDocs": "查看 API 文档"
+    },
+    "audio": {
+      "soundEffects": {
+        "description": "为任务完成、通知和其他交互播放声音",
+        "label": "音效"
+      },
+      "title": "音频"
+    },
+    "defaultPage": {
+      "description": "选择首次打开 TaskTrove 时要看到的页面",
+      "label": "打开 TaskTrove 时显示",
+      "title": "默认页面"
+    },
+    "language": {
+      "description": "选择应用程序的显示语言",
+      "label": "语言",
+      "title": "语言"
+    },
+    "links": {
+      "autoConvert": {
+        "description": "自动将任务标题中的网址转换为可点击的链接",
+        "label": "自动转换网址为链接"
+      },
+      "title": "链接"
+    },
+    "popovers": {
+      "hoverOpen": {
+        "description": "允许弹出窗口在悬停时打开，除了点击之外",
+        "label": "悬停打开"
+      },
+      "title": "弹出窗口"
+    },
+    "startView": {
+      "all": {
+        "description": "在一个地方查看您的所有任务",
+        "label": "所有任务"
+      },
+      "completed": {
+        "description": "查看已完成的任务",
+        "label": "已完成"
+      },
+      "inbox": {
+        "description": "从未整理的任务开始",
+        "label": "收件箱"
+      },
+      "lastViewed": {
+        "description": "返回到您的上次活跃页面",
+        "label": "上次查看"
+      },
+      "today": {
+        "description": "专注于今天的任务",
+        "label": "今天"
+      },
+      "upcoming": {
+        "description": "查看即将到来的任务",
+        "label": "即将到来"
+      }
+    }
+  },
+  "notifications": {
+    "alerts": {
+      "notificationsBlocked": {
+        "manualInstructions": "浏览器没有显示权限对话框。要启用通知，请点击地址栏中的 🔒 图标或转到浏览器设置 → 隐私和安全 → 网站设置 → 通知，然后刷新页面。",
+        "retryInstructions": "请先尝试\"重试\"按钮。如果不起作用，您需要在浏览器设置中手动启用通知。",
+        "title": "通知已被阻止"
+      },
+      "secureConnectionRequired": {
+        "description": "通知需要安全连接（HTTPS）或 localhost。请通过 HTTPS 访问此网站或在 localhost 上运行以启用通知功能。",
+        "title": "需要安全连接"
+      }
+    },
+    "general": {
+      "enableNotifications": {
+        "description": "开启或关闭所有通知",
+        "label": "启用通知"
+      },
+      "requireInteraction": {
+        "description": "通知保持可见直到您与它们交互",
+        "label": "需要用户交互"
+      },
+      "title": "通用设置"
+    },
+    "permissionStatus": {
+      "blocked": "已阻止",
+      "browserNotifications": "浏览器通知",
+      "browserSettingsTooltip": "浏览器可能需要手动更改设置",
+      "enable": "启用",
+      "enabled": "已启用",
+      "notEnabled": "未启用",
+      "requesting": "请求中",
+      "requiresHttps": "通知需要 HTTPS",
+      "retry": "重试",
+      "retryTooltip": "再次尝试请求权限",
+      "testNotification": "测试通知",
+      "title": "权限状态",
+      "tryAgain": "再试一次"
+    }
+  }
+}

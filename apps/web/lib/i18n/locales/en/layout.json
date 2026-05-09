@@ -1,0 +1,173 @@
+{
+  "crash": {
+    "notAvailable": {
+      "description": "Crash test is only available in development environment.",
+      "title": "Crash Test Not Available"
+    }
+  },
+  "debug": {
+    "available": {
+      "description": "Development-only debugging and testing utilities. This page is not available in production.",
+      "simplified": "Debug tools have been simplified in this version.",
+      "title": "TaskTrove Debug Tools"
+    },
+    "notAvailable": {
+      "description": "Debug tools are only available in development environment for security and performance reasons.",
+      "title": "Debug Tools Not Available"
+    }
+  },
+  "empty": {
+    "notifications": {
+      "action": "Go Back",
+      "description": "Notifications temporarily disabled during migration",
+      "title": "Notifications"
+    },
+    "performance": {
+      "action": "Go Back",
+      "description": "Performance monitoring temporarily disabled during migration",
+      "title": "Performance Monitor"
+    },
+    "voice": {
+      "action": "Go Back",
+      "description": "Voice commands temporarily disabled during migration",
+      "title": "Voice Commands"
+    }
+  },
+  "footer": {
+    "completedToday": "Completed Today",
+    "completedTodayLabel": "completed today",
+    "dueToday": "Due Today",
+    "dueTodayLabel": "due today",
+    "no": "No {{title}}",
+    "task": "task",
+    "tasks": "tasks"
+  },
+  "header": {
+    "clickToCycleThemes": "Click to cycle themes.",
+    "collapseSidebar": "Collapse sidebar",
+    "currentTheme": "Current theme: {{theme}}. Click to cycle themes.",
+    "openSidebar": "Open sidebar"
+  },
+  "standardViews": {
+    "all": {
+      "description": "See every task across all projects and labels in one view",
+      "title": "All Tasks"
+    },
+    "assigned-to-me": {
+      "description": "See tasks teammates have assigned directly to you",
+      "title": "Assigned to Me"
+    },
+    "assigned-to-others": {
+      "description": "Monitor tasks you delegated to other teammates",
+      "title": "Assigned to Others"
+    },
+    "calendar": {
+      "description": "Visualize tasks with due dates on a calendar",
+      "title": "Calendar"
+    },
+    "completed": {
+      "description": "Celebrate progress with tasks you've finished",
+      "title": "Completed"
+    },
+    "recent": {
+      "description": "Review tasks created or completed in the last few days",
+      "title": "Recent"
+    },
+    "habits": {
+      "description": "Track repeating tasks and routines that auto-rollover",
+      "title": "Habits"
+    },
+    "inbox": {
+      "description": "Capture new tasks that don't have a home yet",
+      "title": "Inbox"
+    },
+    "labels": {
+      "description": "Organize and filter tasks with custom labels",
+      "title": "Labels"
+    },
+    "not-found": {
+      "description": "The requested resource could not be found",
+      "title": "Not Found"
+    },
+    "projects": {
+      "description": "Browse all projects and jump into dedicated views",
+      "title": "Projects"
+    },
+    "today": {
+      "description": "Keep up with everything scheduled for today",
+      "title": "Today"
+    },
+    "upcoming": {
+      "description": "Plan ahead with tasks scheduled for future dates",
+      "title": "Upcoming"
+    }
+  },
+  "viewOptions": {
+    "displayOptions": {
+      "compact": {
+        "description": "Use a more condensed layout to fit more tasks on screen",
+        "label": "Compact View:",
+        "title": "Compact View"
+      },
+      "completed": {
+        "description": "Show or hide tasks that have been completed",
+        "label": "Completed Tasks:",
+        "title": "Completed Tasks"
+      },
+      "help": {
+        "description": "Control what's visible in your task view:",
+        "tip": "Tip: These settings are saved per view and will persist between sessions"
+      },
+      "label": "Display Options",
+      "overdue": {
+        "description": "Show or hide tasks that are past their due date",
+        "label": "Overdue Tasks:",
+        "title": "Overdue Tasks"
+      },
+      "sidePanel": {
+        "description": "Toggle the side panel for additional task details",
+        "label": "Side Panel:",
+        "title": "Side Panel"
+      }
+    },
+    "help": {
+      "advancedFilters": {
+        "description": "Access powerful filtering options for complex queries",
+        "label": "Advanced Filters:"
+      },
+      "description": "Customize how you view and organize your tasks:",
+      "displayOptions": {
+        "description": "Toggle completed tasks, side panel, and compact view",
+        "label": "Display Options:"
+      },
+      "sortFilter": {
+        "description": "Organize tasks by priority, due date, or other criteria",
+        "label": "Sort & Filter:"
+      },
+      "tip": {
+        "description": "Your view preferences are saved per route and will persist between sessions.",
+        "label": "Tip:"
+      },
+      "viewMode": {
+        "description": "Switch between list, kanban board, and calendar layouts",
+        "label": "View Mode:"
+      }
+    },
+    "sort": {
+      "direction": {
+        "asc": "Ascending",
+        "desc": "Descending",
+        "label": "Sort Direction"
+      },
+      "label": "Sort"
+    },
+    "title": "View Options",
+    "viewMode": {
+      "calendar": "Calendar",
+      "kanban": "Kanban",
+      "kanbanTooltip": "Only available for projects",
+      "label": "View Mode",
+      "list": "List"
+    }
+  }
+}

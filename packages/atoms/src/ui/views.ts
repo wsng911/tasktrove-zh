@@ -1,0 +1,936 @@
+import { atom } from "jotai";
+import {
+  ViewState,
+  ViewStatesSchema,
+  ViewStates,
+  Task,
+  ViewStateSchema,
+  GlobalViewOptions,
+} from "@tasktrove/types/core";
+import { SortConfig } from "@tasktrove/types/utils";
+import { ViewId } from "@tasktrove/types/id";
+import {
+  DEFAULT_VIEW_STATE,
+  DEFAULT_GLOBAL_VIEW_OPTIONS,
+} from "@tasktrove/types/defaults";
+import {
+  DEFAULT_ACTIVE_FILTERS,
+  STANDARD_VIEW_IDS,
+  SIDEBAR_WIDTH_PX_DEFAULT,
+  SIDEBAR_WIDTH_PX_MAX,
+  SIDEBAR_WIDTH_PX_MIN,
+} from "@tasktrove/constants";
+import {
+  createAtomWithStorage,
+  log,
+  namedAtom,
+  deserializeWithDefaults,
+} from "@tasktrove/atoms/utils/atom-helpers";
+import { showTaskPanelAtom } from "@tasktrove/atoms/ui/dialogs";
+import {
+  selectedTaskIdAtom,
+  setSelectedTaskIdAtom,
+} from "@tasktrove/atoms/ui/selection";
+import { tasksAtom } from "@tasktrove/atoms/data/base/atoms";
+
+/**
+ * UI view state atoms for TaskTrove's Jotai migration
+ *
+ * Migrated from useTaskManager hook's view state management.
+ * Handles per-project view states, global view states for routes,
+ * and complex view state updating logic.
+ */
+
+// =============================================================================
+// DEFAULT VALUES
+// =============================================================================
+
+/**
+ * Create default ViewStates object with all standard views initialized
+ */
+function getDefaultViewState(viewId?: ViewId | string): ViewState {
+  if (viewId === "recent") {
+    return { ...DEFAULT_VIEW_STATE, showCompleted: true };
+  }
+
+  return { ...DEFAULT_VIEW_STATE };
+}
+
+/**
+ * Create default ViewStates object with all standard views initialized
+ */
+function createDefaultViewStates(): ViewStates {
+  const defaultStates: ViewStates = {};
+
+  // Initialize all standard views with default state
+  for (const viewId of STANDARD_VIEW_IDS) {
+    defaultStates[viewId] = getDefaultViewState(viewId);
+  }
+
+  return defaultStates;
+}
+
+/**
+ * Safely gets ViewState for a given viewId, creating default if missing
+ * @internal Helper to prevent undefined access errors
+ */
+export function getViewStateOrDefault(
+  viewStates: ViewStates,
+  viewId: ViewId,
+): ViewState {
+  const defaultViewState = getDefaultViewState(viewId);
+
+  if (viewId in viewStates) {
+    const viewState = viewStates[viewId];
+    if (viewState) {
+      return { ...defaultViewState, ...viewState };
+    }
+  }
+  // Return default for missing views (new projects, labels, etc.)
+  return { ...defaultViewState };
+}
+
+/**
+ * Migrates ViewStates data when schema validation fails
+ * Preserves valid user preferences while backfilling missing/invalid fields with defaults
+ * @internal Exported for testing purposes
+ */
+export function migrateViewStates(data: unknown): ViewStates {
+  const migrated: ViewStates = {};
+
+  if (typeof data !== "object" || data === null) {
+    log.warn(
+      { module: "views" },
+      "Invalid ViewStates data type, returning empty object",
+    );
+    return migrated;
+  }
+
+  for (const [viewId, viewState] of Object.entries(data)) {
+    if (
+      typeof viewState !== "object" ||
+      viewState === null ||
+      Array.isArray(viewState)
+    ) {
+      continue;
+    }
+
+    // Try to validate the individual ViewState
+    const stateResult = ViewStateSchema.safeParse(viewState);
+    if (stateResult.success) {
+      // Valid ViewState, use as-is
+      migrated[viewId] = stateResult.data;
+    } else {
+      // Partial migration: preserve valid fields, add defaults for missing/invalid ones
+      const preservedFields: Partial<ViewState> = {};
+
+      // Safely extract valid fields from the old ViewState
+      if (typeof viewState === "object" && viewState !== null) {
+        for (const [key, value] of Object.entries(viewState)) {
+          if (key in DEFAULT_VIEW_STATE) {
+            // Type-safe field preservation with explicit checks
+            if (
+              key === "viewMode" &&
+              (value === "list" ||
+                value === "kanban" ||
+                value === "calendar" ||
+                value === "table" ||
+                value === "stats")
+            ) {
+              preservedFields.viewMode = value;
+            } else if (
+              key === "sortDirection" &&
+              (value === "asc" || value === "desc")
+            ) {
+              preservedFields.sortDirection = value;
+            } else if (key === "sortBy" && typeof value === "string") {
+              preservedFields.sortBy = value;
+            } else if (key === "showCompleted" && typeof value === "boolean") {
+              preservedFields.showCompleted = value;
+            } else if (key === "showArchived" && typeof value === "boolean") {
+              preservedFields.showArchived = value;
+            } else if (key === "showOverdue" && typeof value === "boolean") {
+              preservedFields.showOverdue = value;
+            } else if (key === "searchQuery" && typeof value === "string") {
+              preservedFields.searchQuery = value;
+            } else if (key === "showSidePanel" && typeof value === "boolean") {
+              preservedFields.showSidePanel = value;
+            } else if (key === "showPlanner" && typeof value === "boolean") {
+              preservedFields.showPlanner = value;
+            } else if (key === "compactView" && typeof value === "boolean") {
+              preservedFields.compactView = value;
+            } else if (key === "collapsedSections" && Array.isArray(value)) {
+              preservedFields.collapsedSections = value.filter(
+                (item) => typeof item === "string",
+              );
+            }
+          }
+        }
+      }
+
+      // Merge preserved fields with defaults
+      migrated[viewId] = {
+        ...getDefaultViewState(viewId),
+        ...preservedFields,
+      };
+
+      log.info(
+        {
+          module: "views",
+          viewId,
+          preservedFields: Object.keys(preservedFields),
+          validationError: stateResult.error.issues,
+        },
+        "Migrated ViewState with partial data preservation",
+      );
+    }
+  }
+
+  return migrated;
+}
+
+// =============================================================================
+// BASE ATOMS
+// =============================================================================
+
+/**
+ * Persistent storage of view states per project/view
+ * Maps projectId/viewId -> ViewState
+ * Replaces the viewStates state from useTaskManager
+ */
+export const viewStatesAtom = createAtomWithStorage<ViewStates>(
+  "view-states",
+  createDefaultViewStates(),
+  {
+    getOnInit: true,
+    serialize: (viewStates) => {
+      try {
+        return JSON.stringify(viewStates);
+      } catch (error) {
+        log.error({ error, module: "views" }, "Error serializing view states");
+        return JSON.stringify({});
+      }
+    },
+    deserialize: (str) => {
+      if (!str || str === "null" || str === "undefined") {
+        return {};
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(str);
+      } catch (error) {
+        log.error(
+          { error, module: "views" },
+          "Error parsing JSON for view states",
+        );
+        return {};
+      }
+
+      // Try full validation first
+      const result = ViewStatesSchema.safeParse(parsed);
+      if (result.success) {
+        return result.data;
+      }
+
+      // If full validation fails, attempt graceful migration
+      log.warn(
+        { module: "views", error: result.error },
+        "Schema validation failed, attempting migration",
+      );
+
+      const migrated = migrateViewStates(parsed);
+
+      log.info(
+        { module: "views", preservedViews: Object.keys(migrated).length },
+        "ViewStates migration completed",
+      );
+
+      return migrated;
+    },
+  },
+);
+viewStatesAtom.debugLabel = "viewStatesAtom";
+
+/**
+ * Global view options stored in localStorage
+ * UI preferences that apply across all views
+ */
+export const globalViewOptionsAtom = createAtomWithStorage<GlobalViewOptions>(
+  "global-view-options",
+  DEFAULT_GLOBAL_VIEW_OPTIONS,
+  {
+    deserialize: (str) =>
+      deserializeWithDefaults(str, DEFAULT_GLOBAL_VIEW_OPTIONS, {
+        label: "global view options",
+      }),
+  },
+);
+globalViewOptionsAtom.debugLabel = "globalViewOptionsAtom";
+
+/**
+ * Currently active view/route (today, inbox, ProjectId, etc.)
+ * Tracks which view the user is currently viewing
+ */
+export const currentViewAtom = namedAtom(
+  "currentViewAtom",
+  atom<ViewId>("today"),
+);
+
+// =============================================================================
+// WRITE-ONLY ACTION ATOMS
+// =============================================================================
+
+/**
+ * Updates view state for a specific project/view
+ * Replicates the updateProjectViewState logic from useTaskManager
+ *
+ * Usage: set(updateViewStateAtom, { viewId: projectId, updates: { viewMode: 'kanban' } })
+ */
+export const updateViewStateAtom = atom(
+  null,
+  (
+    get,
+    set,
+    { viewId, updates }: { viewId: ViewId; updates: Partial<ViewState> },
+  ) => {
+    const currentViewStates = get(viewStatesAtom);
+    const currentViewState = currentViewStates[viewId] ?? DEFAULT_VIEW_STATE;
+
+    set(viewStatesAtom, {
+      ...currentViewStates,
+      [viewId]: { ...currentViewState, ...updates },
+    });
+  },
+);
+updateViewStateAtom.debugLabel = "updateViewStateAtom";
+
+/**
+ * @deprecated Use setViewOptionsAtom instead
+ * Changes view mode for current view (list/kanban/calendar)
+ */
+export const setViewModeAtom = atom(
+  null,
+  (get, set, mode: "list" | "kanban" | "calendar" | "table" | "stats") => {
+    set(setViewOptionsAtom, { viewMode: mode });
+  },
+);
+setViewModeAtom.debugLabel = "setViewModeAtom";
+
+/**
+ * Unified atom to update any view options for the current view
+ * Replaces all individual setter atoms for cleaner API
+ *
+ * Usage: set(setViewOptionsAtom, { sortBy: 'priority', sortDirection: 'desc', showCompleted: true })
+ */
+export const setViewOptionsAtom = atom(
+  null,
+  (get, set, updates: Partial<ViewState>) => {
+    const currentView = get(currentViewAtom);
+
+    // Handle showSidePanel globally instead of per-view
+    const filteredUpdates = { ...updates };
+
+    if (currentView === "calendar" && filteredUpdates.viewMode) {
+      delete filteredUpdates.viewMode;
+    }
+    if ("showSidePanel" in updates) {
+      // Update global showSidePanel
+      set(updateGlobalViewOptionsAtom, {
+        showSidePanel: updates.showSidePanel,
+      });
+
+      // Remove showSidePanel from per-view updates
+      delete filteredUpdates.showSidePanel;
+
+      // Sync with task panel atoms when showSidePanel is updated
+      if (updates.showSidePanel) {
+        // When enabling side panel, open task panel with first task if available
+        const allTasks = get(tasksAtom);
+        const firstTask = allTasks[0];
+        if (firstTask) {
+          set(setSelectedTaskIdAtom, firstTask.id);
+          set(showTaskPanelAtom, true);
+        }
+      } else {
+        // When disabling side panel, close task panel
+        set(showTaskPanelAtom, false);
+        set(setSelectedTaskIdAtom, null);
+      }
+    }
+
+    // Apply remaining updates to current view (if any)
+    if (Object.keys(filteredUpdates).length > 0) {
+      set(updateViewStateAtom, {
+        viewId: currentView,
+        updates: filteredUpdates,
+      });
+    }
+  },
+);
+setViewOptionsAtom.debugLabel = "setViewOptionsAtom";
+
+/**
+ * @deprecated Use setViewOptionsAtom instead
+ * Updates sort settings for current view
+ */
+export const setSortingAtom = atom(
+  null,
+  (
+    get,
+    set,
+    {
+      sortBy,
+      sortDirection,
+    }: { sortBy?: string; sortDirection?: "asc" | "desc" },
+  ) => {
+    const updates: Partial<ViewState> = {};
+    if (sortBy !== undefined) updates.sortBy = sortBy;
+    if (sortDirection !== undefined) updates.sortDirection = sortDirection;
+    set(setViewOptionsAtom, updates);
+  },
+);
+setSortingAtom.debugLabel = "setSortingAtom";
+
+/**
+ * @deprecated Use setViewOptionsAtom instead
+ * Updates search query for current view
+ */
+export const setSearchQueryAtom = atom(null, (get, set, query: string) => {
+  set(setViewOptionsAtom, { searchQuery: query });
+});
+setSearchQueryAtom.debugLabel = "setSearchQueryAtom";
+
+/**
+ * @deprecated Use setViewOptionsAtom instead
+ * Toggles completed task visibility for current view
+ */
+export const setShowCompletedAtom = atom(null, (get, set, show: boolean) => {
+  set(setViewOptionsAtom, { showCompleted: show });
+});
+setShowCompletedAtom.debugLabel = "setShowCompletedAtom";
+
+/**
+ * @deprecated Use setViewOptionsAtom instead
+ * Toggles overdue task visibility for current view
+ */
+export const setShowOverdueAtom = atom(null, (get, set, show: boolean) => {
+  set(setViewOptionsAtom, { showOverdue: show });
+});
+setShowOverdueAtom.debugLabel = "setShowOverdueAtom";
+
+/**
+ * @deprecated Use setViewOptionsAtom instead
+ * Toggles compact view for current view
+ */
+export const setCompactViewAtom = atom(null, (get, set, compact: boolean) => {
+  set(setViewOptionsAtom, { compactView: compact });
+});
+setCompactViewAtom.debugLabel = "setCompactViewAtom";
+
+/**
+ * Toggles collapse state for a specific section in current view
+ * Usage: set(toggleSectionCollapseAtom, sectionId)
+ */
+export const toggleSectionCollapseAtom = atom(
+  null,
+  (get, set, sectionId: string) => {
+    const currentCollapsed = get(collapsedSectionsAtom);
+
+    const isCollapsed = currentCollapsed.includes(sectionId);
+    const newCollapsed = isCollapsed
+      ? currentCollapsed.filter((id) => id !== sectionId)
+      : [...currentCollapsed, sectionId];
+
+    set(setViewOptionsAtom, { collapsedSections: newCollapsed });
+  },
+);
+toggleSectionCollapseAtom.debugLabel = "toggleSectionCollapseAtom";
+
+/**
+ * Sets active filters for current view
+ * Usage: set(setActiveFiltersAtom, { priorities: [1, 2], labels: ['urgent'] })
+ */
+export const setActiveFiltersAtom = atom(
+  null,
+  (get, set, filters: ViewState["activeFilters"]) => {
+    set(setViewOptionsAtom, { activeFilters: filters });
+  },
+);
+setActiveFiltersAtom.debugLabel = "setActiveFiltersAtom";
+
+/**
+ * Clears all active filters for current view
+ * Usage: set(clearActiveFiltersAtom)
+ */
+export const clearActiveFiltersAtom = atom(null, (get, set) => {
+  set(setViewOptionsAtom, { activeFilters: DEFAULT_ACTIVE_FILTERS });
+});
+clearActiveFiltersAtom.debugLabel = "clearActiveFiltersAtom";
+
+/**
+ * Updates specific filter properties for current view
+ * Usage: set(updateFiltersAtom, { priorities: [1, 2] })
+ */
+export const updateFiltersAtom = atom(
+  null,
+  (get, set, updates: Partial<NonNullable<ViewState["activeFilters"]>>) => {
+    const currentViewState = get(currentViewStateAtom);
+    const currentFilters =
+      currentViewState.activeFilters || DEFAULT_ACTIVE_FILTERS;
+    const newFilters = { ...currentFilters, ...updates };
+    set(setActiveFiltersAtom, newFilters);
+  },
+);
+updateFiltersAtom.debugLabel = "updateFiltersAtom";
+
+/**
+ * Update global view options
+ * Usage: set(updateGlobalViewOptionsAtom, { sidePanelWidth: 30 })
+ */
+export const updateGlobalViewOptionsAtom = atom(
+  null,
+  (get, set, updates: Partial<GlobalViewOptions>) => {
+    const current = get(globalViewOptionsAtom);
+    set(globalViewOptionsAtom, { ...current, ...updates });
+  },
+);
+updateGlobalViewOptionsAtom.debugLabel = "updateGlobalViewOptionsAtom";
+
+// =============================================================================
+// DERIVED READ ATOMS
+// =============================================================================
+
+/**
+ * Gets ViewState for the current view
+ * Replicates getProjectViewState logic from useTaskManager
+ * Returns default state if no specific state exists
+ */
+export const currentViewStateAtom = atom<ViewState>((get) => {
+  const currentView = get(currentViewAtom);
+  const viewStates = get(viewStatesAtom);
+  const baseViewState = viewStates[currentView] ?? DEFAULT_VIEW_STATE;
+
+  // Patch showSidePanel from global atom
+  const globalShowSidePanel = get(globalShowSidePanelAtom);
+  return {
+    ...baseViewState,
+    showSidePanel: globalShowSidePanel,
+    viewMode: currentView === "calendar" ? "calendar" : baseViewState.viewMode,
+  };
+});
+currentViewStateAtom.debugLabel = "currentViewStateAtom";
+
+/**
+ * Checks if current view is in list mode
+ * Convenience atom for component conditional rendering
+ */
+export const isListViewAtom = atom<boolean>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.viewMode === "list";
+});
+isListViewAtom.debugLabel = "isListViewAtom";
+
+/**
+ * Checks if current view is in kanban mode
+ * Convenience atom for component conditional rendering
+ */
+export const isKanbanViewAtom = atom<boolean>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.viewMode === "kanban";
+});
+isKanbanViewAtom.debugLabel = "isKanbanViewAtom";
+
+/**
+ * Checks if current view is in calendar mode
+ * Convenience atom for component conditional rendering
+ */
+export const isCalendarViewAtom = atom<boolean>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.viewMode === "calendar";
+});
+isCalendarViewAtom.debugLabel = "isCalendarViewAtom";
+
+/**
+ * Tracks the currently selected calendar date for calendar view mode.
+ * Used to prefill quick add due date when opening from calendar.
+ */
+export const selectedCalendarDateAtom = atom<Date | null>(null);
+selectedCalendarDateAtom.debugLabel = "selectedCalendarDateAtom";
+
+/**
+ * Gets current search query
+ * Used for search input component and task filtering
+ */
+export const searchQueryAtom = atom<string>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.searchQuery;
+});
+searchQueryAtom.debugLabel = "searchQueryAtom";
+
+/**
+ * Gets current sort configuration
+ * Used for task sorting and sort controls
+ */
+export const sortConfigAtom = atom<SortConfig>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return {
+    field: viewState.sortBy,
+    direction: viewState.sortDirection,
+  };
+});
+sortConfigAtom.debugLabel = "sortConfigAtom";
+
+/**
+ * Gets whether completed tasks are shown
+ * Used for task filtering and toggle controls
+ */
+export const showCompletedAtom = atom<boolean>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.showCompleted;
+});
+showCompletedAtom.debugLabel = "showCompletedAtom";
+
+/**
+ * Gets whether archived tasks are shown
+ * Used for task filtering and toggle controls
+ */
+export const showArchivedAtom = atom<boolean>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.showArchived ?? false;
+});
+showArchivedAtom.debugLabel = "showArchivedAtom";
+
+/**
+ * Gets whether overdue tasks are shown
+ * Used for task filtering and toggle controls
+ */
+export const showOverdueAtom = atom<boolean>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.showOverdue;
+});
+showOverdueAtom.debugLabel = "showOverdueAtom";
+
+/**
+ * Gets whether compact view is enabled
+ * Used for task rendering and toggle controls
+ */
+export const compactViewAtom = atom<boolean>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.compactView;
+});
+compactViewAtom.debugLabel = "compactViewAtom";
+
+/**
+ * Gets collapsed sections for current view
+ * Used for section collapse state management
+ */
+export const collapsedSectionsAtom = atom<string[]>((get) => {
+  const viewState = get(currentViewStateAtom);
+  return viewState.collapsedSections || [];
+});
+collapsedSectionsAtom.debugLabel = "collapsedSectionsAtom";
+
+/**
+ * Gets active filters for current view
+ * Used for filter UI components and filter state display
+ */
+export const activeFiltersAtom = atom<NonNullable<ViewState["activeFilters"]>>(
+  (get) => {
+    const viewState = get(currentViewStateAtom);
+    return viewState.activeFilters || DEFAULT_ACTIVE_FILTERS;
+  },
+);
+activeFiltersAtom.debugLabel = "activeFiltersAtom";
+
+/**
+ * Checks if any filters are currently active
+ * Used for filter indicator and clear all button state
+ */
+export const hasActiveFiltersAtom = atom<boolean>((get) => {
+  const filters = get(activeFiltersAtom);
+  return Object.values(filters).some((filter) => {
+    if (Array.isArray(filter)) {
+      return filter.length > 0;
+    }
+    if (typeof filter === "object" && filter !== null) {
+      return Object.values(filter).length > 0;
+    }
+    return Boolean(filter);
+  });
+});
+hasActiveFiltersAtom.debugLabel = "hasActiveFiltersAtom";
+
+/**
+ * Gets count of active filters
+ * Used for filter badge count display
+ */
+export const activeFilterCountAtom = atom<number>((get) => {
+  const filters = get(activeFiltersAtom);
+  let count = 0;
+
+  if (filters.projectIds?.length) count += filters.projectIds.length;
+
+  // Handle labels: null = 1 filter, array with length > 0 = array length
+  if (filters.labels === null) {
+    count += 1; // "no labels" filter is active
+  } else if (filters.labels && filters.labels.length > 0) {
+    count += filters.labels.length;
+  }
+
+  if (filters.priorities?.length) count += filters.priorities.length;
+  if (filters.completed !== undefined) count++;
+  if (
+    filters.dueDateFilter &&
+    (filters.dueDateFilter.preset || filters.dueDateFilter.customRange)
+  )
+    count++;
+
+  return count;
+});
+activeFilterCountAtom.debugLabel = "activeFilterCountAtom";
+
+/**
+ * Side panel width as percentage (20-80%, default 25%)
+ * Used for ResizablePanel components across views
+ */
+export const sidePanelWidthAtom = atom<number>((get) => {
+  return get(globalViewOptionsAtom).sidePanelWidth;
+});
+sidePanelWidthAtom.debugLabel = "sidePanelWidthAtom";
+
+const clampSidebarWidthPx = (value: number) =>
+  Math.min(SIDEBAR_WIDTH_PX_MAX, Math.max(SIDEBAR_WIDTH_PX_MIN, value));
+
+const getSanitizedSidebarWidth = (value: unknown) => {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return SIDEBAR_WIDTH_PX_DEFAULT;
+  }
+  return clampSidebarWidthPx(value);
+};
+
+/**
+ * Primary sidebar width in pixels (240-480px, default 256px)
+ * Shares persistence with other global view options
+ */
+export const sideBarWidthAtom = atom(
+  (get) => {
+    const rawValue = get(globalViewOptionsAtom).sideBarWidth;
+    return getSanitizedSidebarWidth(rawValue);
+  },
+  (get, set, update: number | ((value: number) => number)) => {
+    const rawValue = get(globalViewOptionsAtom).sideBarWidth;
+    const current = getSanitizedSidebarWidth(rawValue);
+    const next = clampSidebarWidthPx(
+      typeof update === "function" ? update(current) : update,
+    );
+    set(updateGlobalViewOptionsAtom, { sideBarWidth: next });
+  },
+);
+sideBarWidthAtom.debugLabel = "sideBarWidthAtom";
+
+/**
+ * Global side panel visibility (applies across all views)
+ * Used to control side panel visibility globally
+ */
+export const globalShowSidePanelAtom = atom<boolean>((get) => {
+  return get(globalViewOptionsAtom).showSidePanel;
+});
+globalShowSidePanelAtom.debugLabel = "globalShowSidePanelAtom";
+
+/**
+ * People panel owner section collapse state
+ * Used for PeopleContent component owner section
+ */
+export const peopleOwnerCollapsedAtom = atom(
+  (get) => get(globalViewOptionsAtom).peopleOwnerCollapsed,
+  (get, set, newValue: boolean) => {
+    set(updateGlobalViewOptionsAtom, { peopleOwnerCollapsed: newValue });
+  },
+);
+peopleOwnerCollapsedAtom.debugLabel = "peopleOwnerCollapsedAtom";
+
+/**
+ * People panel assignees section collapse state
+ * Used for PeopleContent component assignees section
+ */
+export const peopleAssigneesCollapsedAtom = atom(
+  (get) => get(globalViewOptionsAtom).peopleAssigneesCollapsed,
+  (get, set, newValue: boolean) => {
+    set(updateGlobalViewOptionsAtom, { peopleAssigneesCollapsed: newValue });
+  },
+);
+peopleAssigneesCollapsedAtom.debugLabel = "peopleAssigneesCollapsedAtom";
+
+/**
+ * Map of dismissible UI states keyed by component id
+ * Enables global persistence for hide/dismiss toggles across the app
+ */
+export const dismissedUiMapAtom = atom(
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  (get) => get(globalViewOptionsAtom).dismissedUi ?? {},
+  (
+    get,
+    set,
+    update:
+      | Record<string, boolean>
+      | ((current: Record<string, boolean>) => Record<string, boolean>),
+  ) => {
+    // Older persisted state might not have the dismissedUi key yet, so
+    // normalize to an empty object before reading/updating.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const current = get(globalViewOptionsAtom).dismissedUi ?? {};
+    const next = typeof update === "function" ? update(current) : update;
+    set(updateGlobalViewOptionsAtom, { dismissedUi: next });
+  },
+);
+dismissedUiMapAtom.debugLabel = "dismissedUiMapAtom";
+
+// =============================================================================
+// UTILITY ATOMS
+// =============================================================================
+
+/**
+ * Gets view state for a specific view/project
+ * Useful for components that need to display state for views other than current
+ *
+ * Usage: get(getViewStateAtom(projectId))
+ */
+export const getViewStateAtom = (viewId: ViewId) =>
+  atom<ViewState>((get) => {
+    const viewStates = get(viewStatesAtom);
+    return viewStates[viewId] ?? DEFAULT_VIEW_STATE;
+  });
+
+/**
+ * Resets view state for current view back to defaults
+ * Useful for reset buttons and clearing filters
+ */
+export const resetCurrentViewStateAtom = atom(null, (get, set) => {
+  const currentView = get(currentViewAtom);
+  set(updateViewStateAtom, {
+    viewId: currentView,
+    updates: DEFAULT_VIEW_STATE,
+  });
+});
+resetCurrentViewStateAtom.debugLabel = "resetCurrentViewStateAtom";
+
+/**
+ * Resets view state for a specific view back to defaults
+ * Usage: set(resetViewStateAtom, projectId)
+ */
+export const resetViewStateAtom = atom(null, (get, set, viewId: ViewId) => {
+  set(updateViewStateAtom, { viewId, updates: DEFAULT_VIEW_STATE });
+});
+resetViewStateAtom.debugLabel = "resetViewStateAtom";
+
+// =============================================================================
+// TASK PANEL INTEGRATION
+// =============================================================================
+
+/**
+ * Toggles task panel with proper view state synchronization
+ * This is the correct atom to use for task clicks that should control side panel
+ *
+ * When task panel is closed, it also disables showSidePanel view option
+ * When task panel is opened, it enables showSidePanel view option
+ */
+export const toggleTaskPanelWithViewStateAtom = atom(
+  null,
+  (get, set, task: Task) => {
+    const isCurrentlyOpen = get(showTaskPanelAtom);
+    const currentTaskId = get(selectedTaskIdAtom);
+    const globalShowSidePanel = get(globalShowSidePanelAtom);
+
+    if (isCurrentlyOpen && currentTaskId === task.id) {
+      // If panel is open with the same task, close it completely
+      set(resetSidePanelStateAtom);
+    } else {
+      // Otherwise, open/switch to the new task
+      set(setSelectedTaskIdAtom, task.id);
+      set(showTaskPanelAtom, true);
+      // Enable side panel view option if not already enabled
+      if (!globalShowSidePanel) {
+        set(updateGlobalViewOptionsAtom, { showSidePanel: true });
+      }
+    }
+  },
+);
+toggleTaskPanelWithViewStateAtom.debugLabel =
+  "toggleTaskPanelWithViewStateAtom";
+
+/**
+ * Reset side panel state - closes panel and disables showSidePanel view option
+ * Used when entering selection mode or when panel needs to be fully closed
+ */
+export const resetSidePanelStateAtom = atom(null, (get, set) => {
+  // Close the panel completely
+  set(showTaskPanelAtom, false);
+  set(setSelectedTaskIdAtom, null);
+
+  // Also disable side panel view option to ensure panel fully closes
+  set(updateGlobalViewOptionsAtom, { showSidePanel: false });
+});
+resetSidePanelStateAtom.debugLabel = "resetSidePanelStateAtom";
+
+// =============================================================================
+// EXPORTS
+// =============================================================================
+
+/**
+ * Collection of all view-related atoms for easy import
+ * Organized by category for better developer experience
+ */
+export const viewAtoms = {
+  // Base state
+  viewStates: viewStatesAtom,
+  currentView: currentViewAtom,
+  currentViewState: currentViewStateAtom,
+  globalViewOptions: globalViewOptionsAtom,
+
+  // Actions
+  updateViewState: updateViewStateAtom,
+  setViewOptions: setViewOptionsAtom,
+  updateGlobalViewOptions: updateGlobalViewOptionsAtom,
+  // Deprecated - use setViewOptions instead
+  setViewMode: setViewModeAtom,
+  setSorting: setSortingAtom,
+  setSearchQuery: setSearchQueryAtom,
+  setShowCompleted: setShowCompletedAtom,
+  setShowOverdue: setShowOverdueAtom,
+  setCompactView: setCompactViewAtom,
+  toggleSectionCollapse: toggleSectionCollapseAtom,
+  resetCurrentViewState: resetCurrentViewStateAtom,
+  resetViewState: resetViewStateAtom,
+  resetSidePanelState: resetSidePanelStateAtom,
+  // Filter actions
+  setActiveFilters: setActiveFiltersAtom,
+  clearActiveFilters: clearActiveFiltersAtom,
+  updateFilters: updateFiltersAtom,
+
+  // Derived state
+  isListView: isListViewAtom,
+  isKanbanView: isKanbanViewAtom,
+  isCalendarView: isCalendarViewAtom,
+  selectedCalendarDate: selectedCalendarDateAtom,
+  searchQuery: searchQueryAtom,
+  sortConfig: sortConfigAtom,
+  showCompleted: showCompletedAtom,
+  showArchived: showArchivedAtom,
+  showOverdue: showOverdueAtom,
+  compactView: compactViewAtom,
+  collapsedSections: collapsedSectionsAtom,
+  sidePanelWidth: sidePanelWidthAtom,
+  sideBarWidth: sideBarWidthAtom,
+  globalShowSidePanel: globalShowSidePanelAtom,
+  peopleOwnerCollapsed: peopleOwnerCollapsedAtom,
+  peopleAssigneesCollapsed: peopleAssigneesCollapsedAtom,
+  dismissedUiMap: dismissedUiMapAtom,
+  // Filter state
+  activeFilters: activeFiltersAtom,
+  hasActiveFilters: hasActiveFiltersAtom,
+  activeFilterCount: activeFilterCountAtom,
+
+  // Utilities
+  getViewState: getViewStateAtom,
+};

@@ -1,0 +1,54 @@
+{
+  "emptyStates": {
+    "all": {
+      "description": "This view shows all your tasks across all projects. Create your first task to get started with TaskTrove.",
+      "title": "No tasks found"
+    },
+    "analytics": {
+      "description": "Track your productivity and task completion patterns.",
+      "title": "Analytics Dashboard"
+    },
+    "completed": {
+      "description": "Tasks you've finished will appear here. Complete some tasks to see your progress and celebrate your wins!",
+      "title": "No completed tasks yet"
+    },
+    "fallback": {
+      "description": "Create your first task to get started.",
+      "title": "No tasks found"
+    },
+    "inbox": {
+      "description": "This is your default collection point for all new tasks. When you create a task without specifying a project, it lands here.",
+      "title": "Your Inbox is empty"
+    },
+    "label": {
+      "description": "Tasks tagged with this label will appear here. Use labels to categorize and quickly find related tasks.",
+      "title": "No tasks with {{labelName}} label"
+    },
+    "project": {
+      "description": "This project is empty. Add tasks to organize your work and track progress on specific goals.",
+      "title": "No tasks in {{projectName}}"
+    },
+    "search": {
+      "description": "Find tasks by title, description, or labels.",
+      "title": "Search Results"
+    },
+    "today": {
+      "description": "Tasks with today's due date will appear here. Set due dates on your tasks to stay on track with your daily goals.",
+      "title": "Nothing scheduled for today"
+    },
+    "upcoming": {
+      "description": "Tasks with future due dates show up here, helping you plan ahead and prepare for what's coming next.",
+      "title": "No upcoming tasks"
+    }
+  },
+  "mainNav": {
+    "allTasks": "All Tasks",
+    "calendar": "Calendar",
+    "completed": "Completed",
+    "habits": "Habits",
+    "inbox": "Inbox",
+    "recent": "Recent",
+    "today": "Today",
+    "upcoming": "Upcoming"
+  }
+}

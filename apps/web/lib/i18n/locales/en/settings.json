@@ -1,0 +1,231 @@
+{
+  "appearance": {
+    "colorScheme": {
+      "description": "Select light, dark, or follow system preference",
+      "label": "Choose your color scheme",
+      "title": "Color Scheme"
+    },
+    "scrollbar": {
+      "description": "Hide scrollbars in scrollable areas for a cleaner look.",
+      "label": "Hide scrollbars",
+      "title": "Scrollbars",
+      "enabled": "Scrollbars are now hidden",
+      "disabled": "Scrollbars are now visible"
+    }
+  },
+  "data": {
+    "autoBackup": {
+      "description": "Automatically backup your data daily to protect against data loss.",
+      "schedulerRedirect": {
+        "button": "Open Scheduler Settings",
+        "description": "Auto backup controls now live in Scheduler settings. Head there to enable the job, change the cron time, or run a manual backup."
+      },
+      "title": "Auto Backup"
+    },
+    "taskImport": {
+      "description": "Import tasks from other task management applications.",
+      "step1": {
+        "description": "Click your task management service below to open the import assistant. Follow the instructions to export and convert your data to TaskTrove format.",
+        "title": "Step 1: Export Your Data"
+      },
+      "step2": {
+        "description": "After using the import assistant above, you'll download a JSON file. Upload that file here to import your tasks, projects, and labels into TaskTrove.",
+        "important": {
+          "description": "Only upload the JSON file you downloaded from the import assistant. Regular exports from other apps won't work.",
+          "title": "Important:"
+        },
+        "title": "Step 2: Upload Converted File"
+      },
+      "title": "Task Import",
+      "upload": {
+        "button": "Upload JSON File",
+        "error": {
+          "title": "Import failed"
+        },
+        "success": {
+          "alreadyExisted": "{{items}} already existed",
+          "imported": "{{items}} imported",
+          "labels_one": "{{count}} labels",
+          "labels_other": "{{count}} labels",
+          "noNewItems": "No new items",
+          "projects_one": "{{count}} projects",
+          "projects_other": "{{count}} projects",
+          "tasks_one": "{{count}} tasks",
+          "tasks_other": "{{count}} tasks",
+          "title": "Import successful!"
+        },
+        "uploading": "Uploading..."
+      }
+    }
+  },
+  "general": {
+    "apiToken": {
+      "description": "Generate an API token for programmatic access. Use this token in the Authorization header as 'Bearer YOUR_TOKEN' to authenticate API requests.",
+      "generate": "Generate Token",
+      "label": "API Token",
+      "regenerate": "Regenerate Token",
+      "revoke": "Revoke Token",
+      "title": "API",
+      "viewDocs": "View API Documentation"
+    },
+    "audio": {
+      "soundEffects": {
+        "description": "Play sounds for task completions, notifications, and other interactions",
+        "label": "Sound Effects"
+      },
+      "title": "Audio"
+    },
+    "defaultPage": {
+      "description": "Choose which page you want to see when you first open TaskTrove",
+      "label": "When you open TaskTrove, show",
+      "title": "Default Page"
+    },
+    "language": {
+      "description": "Select the display language for the application",
+      "label": "Language",
+      "title": "Language"
+    },
+    "dates": {
+      "preferDayMonth": {
+        "description": "When a date like 1/2 is ambiguous, interpret it as 1 February instead of Jan 2",
+        "label": "Prefer day/month for numeric dates"
+      },
+      "title": "Dates"
+    },
+    "links": {
+      "autoConvert": {
+        "description": "Automatically convert URLs in task titles to clickable links",
+        "label": "Auto-convert URLs to Links"
+      },
+      "title": "Links"
+    },
+    "popovers": {
+      "hoverOpen": {
+        "description": "Allow popovers to open when you hover over them, in addition to clicking",
+        "label": "Open on Hover"
+      },
+      "title": "Popovers"
+    },
+    "startView": {
+      "all": {
+        "description": "See every task across all projects and labels in one view",
+        "label": "All Tasks"
+      },
+      "completed": {
+        "description": "Celebrate progress with tasks you've finished",
+        "label": "Completed"
+      },
+      "inbox": {
+        "description": "Capture new tasks that don't have a home yet",
+        "label": "Inbox"
+      },
+      "lastViewed": {
+        "description": "Return to your last active page",
+        "label": "Last Viewed"
+      },
+      "today": {
+        "description": "Keep up with everything scheduled for today",
+        "label": "Today"
+      },
+      "upcoming": {
+        "description": "Plan ahead with tasks scheduled for future dates",
+        "label": "Upcoming"
+      }
+    }
+  },
+  "notifications": {
+    "alerts": {
+      "notificationsBlocked": {
+        "manualInstructions": "The browser didn't show a permission dialog. To enable notifications, click the 🔒 icon in your address bar or go to browser settings → Privacy & Security → Site Settings → Notifications, then refresh the page.",
+        "retryInstructions": "Try the \"Retry\" button first. If that doesn't work, you'll need to enable notifications manually in your browser settings.",
+        "title": "Notifications Blocked"
+      },
+      "secureConnectionRequired": {
+        "description": "Notifications require a secure connection (HTTPS) or localhost. Please access this site via HTTPS or run it on localhost to enable notification features.",
+        "title": "Secure Connection Required"
+      }
+    },
+    "general": {
+      "enableNotifications": {
+        "description": "Turn all notifications on or off",
+        "label": "Enable Notifications"
+      },
+      "requireInteraction": {
+        "description": "Notifications stay visible until you interact with them",
+        "label": "Require User Interaction"
+      },
+      "title": "General Settings"
+    },
+    "permissionStatus": {
+      "blocked": "Blocked",
+      "browserNotifications": "Browser Notifications",
+      "browserSettingsTooltip": "Browser may require manual settings change",
+      "enable": "Enable",
+      "enabled": "Enabled",
+      "notEnabled": "Not enabled",
+      "requesting": "Requesting",
+      "requiresHttps": "Notification requires HTTPS",
+      "retry": "Retry",
+      "retryTooltip": "Try requesting permission again",
+      "testNotification": "Test Notification",
+      "title": "Permission Status",
+      "tryAgain": "Try Again"
+    }
+  },
+  "scheduler": {
+    "title": "Scheduler",
+    "description": "Monitor and configure background jobs that keep your workspace healthy.",
+    "state": {
+      "label": "Scheduler State",
+      "running": "Running",
+      "stopped": "Stopped"
+    },
+    "actions": {
+      "refresh": "Refresh jobs"
+    },
+    "jobs": {
+      "title": "Registered Jobs",
+      "backup": {
+        "runOnInit": "Run once on scheduler start",
+        "config": {
+          "label": "Configure backup",
+          "title": "Backup settings",
+          "maxBackups": {
+            "label": "Max backup count",
+            "description": "Use -1 to keep unlimited backups."
+          }
+        }
+      },
+      "calendar": {
+        "runOnInit": "Run once on scheduler start",
+        "config": {
+          "label": "Open calendar sync settings"
+        }
+      },
+      "columns": {
+        "id": "Job ID",
+        "schedule": "Schedule",
+        "config": "Config",
+        "runOnStart": "Run on start",
+        "autoStart": "Auto start"
+      },
+      "autoStart": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "empty": "No scheduled jobs found.",
+      "loading": "Loading jobs..."
+    },
+    "controls": {
+      "enable": "Enable daily backup job",
+      "enableDescription": "Stop or resume running the backup job without touching cron.",
+      "backupTime": "Backup start time",
+      "backupTimeDescription": "Set the daily cron start (24-hour time)",
+      "manualBackup": {
+        "title": "Manual backup",
+        "description": "Need a one-off backup before big changes? Trigger it instantly.",
+        "button": "Trigger Manual Backup Now"
+      }
+    }
+  }
+}

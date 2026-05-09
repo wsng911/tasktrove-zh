@@ -1,0 +1,84 @@
+{
+  "name": "@tasktrove/utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "pro": "./src/index.pro.ts",
+      "default": "./src/index.ts"
+    },
+    "./color": "./src/color.ts",
+    "./styling": "./src/styling.ts",
+    "./time": "./src/time.ts",
+    "./validation": "./src/validation.ts",
+    "./routing": "./src/routing.ts",
+    "./group-utils": "./src/group-utils.ts",
+    "./parser": "./src/parser.ts",
+    "./parser-adapter": "./src/parser-adapter.ts",
+    "./time-estimation": "./src/time-estimation.ts",
+    "./origin-validation": "./src/origin-validation.ts",
+    "./shared-patterns": {
+      "pro": "./src/shared-patterns.pro.ts",
+      "default": "./src/shared-patterns.ts"
+    },
+    "./encryption": "./src/encryption.ts",
+    "./color-utils": "./src/color-utils.ts",
+    "./date-filter-utils": "./src/date-filter-utils.ts",
+    "./task-date-formatter": "./src/task-date-formatter.ts",
+    "./project-permissions": {
+      "pro": "./src/project-permissions.pro.ts",
+      "default": "./src/project-permissions.pro.ts"
+    },
+    "./version": "./src/version.ts",
+    "./notification": "./src/notification.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck:base": "tsgo --noEmit",
+    "typecheck:pro": "tsgo --project tsconfig.pro.json --noEmit",
+    "typecheck": "pnpm typecheck:base && (test -f tsconfig.pro.json && pnpm typecheck:pro || true)",
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "check:pro": "pnpm typecheck:pro && pnpm lint && pnpm test:pro",
+    "test:base": "node ../../scripts/run-vitest.mjs run --reporter=dot --no-coverage --config vitest.config.ts",
+    "test:pro": "node ../../scripts/run-vitest.mjs run --reporter=dot --no-coverage --config vitest.config.pro.ts",
+    "test": "pnpm test:base && (test -f vitest.config.pro.ts && pnpm test:pro || true)",
+    "test:watch": "node ../../scripts/run-vitest.mjs --watch",
+    "test:watch:pro": "node ../../scripts/run-vitest.mjs --watch --config vitest.config.pro.ts",
+    "recurring:cli": "node --import tsx --no-warnings scripts/recurring-cli.ts"
+  },
+  "dependencies": {
+    "@tasktrove/constants": "workspace:*",
+    "@tasktrove/parser": "workspace:*",
+    "@tasktrove/types": "workspace:*",
+    "bcryptjs": "catalog:",
+    "clsx": "catalog:",
+    "date-fns": "latest",
+    "lodash.mergewith": "4.6.2",
+    "rrule": "catalog:",
+    "slugify": "catalog:",
+    "tailwind-merge": "catalog:",
+    "uuid": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@testing-library/jest-dom": "catalog:",
+    "@types/bcryptjs": "catalog:",
+    "@types/lodash.mergewith": "4.6.7",
+    "@types/node": "catalog:",
+    "@types/uuid": "catalog:",
+    "@typescript/native-preview": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "happy-dom": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

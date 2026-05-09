@@ -1,0 +1,379 @@
+import fs from "fs/promises"
+import path from "path"
+import { v4 as uuidv4 } from "uuid"
+import { z } from "zod"
+import { Mutex } from "async-mutex"
+import { log } from "./logger"
+import { DataFile, DataFileSchema, UserFile, UserFileSchema } from "@tasktrove/types/data-file"
+import { DataFileSerializationSchema } from "@tasktrove/types/data-file"
+import { DEFAULT_DATA_FILE_PATH, DEFAULT_DATA_DIR, DEFAULT_AVATAR_DIR } from "@tasktrove/constants"
+
+// Create a mutex instance to synchronize all file read/write operations
+const fileOperationsMutex = new Mutex()
+
+/**
+ * Safely parses a JSON file from the given filepath and validates it against a Zod schema.
+ * This is a convenience wrapper around safeReadJsonFile for data files.
+ *
+ * @param options - Configuration options for reading the data file
+ * @param options.filePath - Path to the JSON file to read (defaults to DEFAULT_DATA_FILE_PATH)
+ * @returns The parsed and validated object, or undefined if parsing/validation fails.
+ */
+export async function safeReadDataFile({
+  filePath = DEFAULT_DATA_FILE_PATH,
+}: { filePath?: string } = {}): Promise<DataFile | undefined> {
+  return safeReadJsonFile({
+    filePath,
+    schema: DataFileSchema,
+    // No defaultValue - data files return undefined on failure
+  })
+}
+
+/**
+ * Safely reads just the user field from the data file.
+ * This is a lightweight alternative to safeReadDataFile for auth purposes.
+ * Uses UserFileSchema which only validates the user field, avoiding full validation.
+ *
+ * @param options - Configuration options for reading the user data
+ * @param options.filePath - Path to the JSON file to read (defaults to DEFAULT_DATA_FILE_PATH)
+ * @returns The user data from the file, or undefined if parsing/validation fails.
+ */
+export async function safeReadUserFile({
+  filePath = DEFAULT_DATA_FILE_PATH,
+}: { filePath?: string } = {}): Promise<UserFile | undefined> {
+  return safeReadJsonFile({
+    filePath,
+    schema: UserFileSchema,
+    // No defaultValue - return undefined on failure
+  })
+}
+
+/**
+ * Safely writes just the user field to the data file, preserving all other fields.
+ * This is a lightweight alternative to safeWriteDataFile for user updates.
+ * Uses read-modify-write pattern to avoid overwriting tasks, projects, labels, etc.
+ *
+ * @param options - Configuration options for writing the user data
+ * @param options.filePath - Path to the JSON file to write (defaults to DEFAULT_DATA_FILE_PATH)
+ * @param options.data - The user data object to write to the file
+ * @param options.schema - Zod schema to validate the user data
+ * @returns true if the write operation was successful, false otherwise.
+ */
+export async function safeWriteUserFile<T extends UserFile>({
+  filePath = DEFAULT_DATA_FILE_PATH,
+  data,
+  schema,
+}: {
+  filePath?: string
+  data: T
+  schema: z.ZodSchema<T>
+}): Promise<boolean> {
+  log.debug(`Attempting to update user field in file: ${filePath}`)
+
+  // Validate the user data against the provided schema
+  let validatedData: T
+  try {
+    validatedData = schema.parse(data, { reportInput: true })
+    log.debug(`User data validated successfully for file: ${filePath}`)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      log.error(`User data validation failed for file ${filePath}:`)
+      log.error(JSON.stringify(error.issues, null, 2))
+    } else if (error instanceof Error) {
+      log.error(
+        `An unexpected error occurred during user data validation for file ${filePath}: ${error.message}`,
+      )
+    } else {
+      log.error(`An unknown error occurred during user data validation for file ${filePath}`)
+    }
+    return false
+  }
+
+  return await fileOperationsMutex.runExclusive(async () => {
+    // Read existing file as raw JSON (no schema validation)
+    let existingJson: Record<string, unknown>
+    try {
+      const fileContent = await fs.readFile(filePath, "utf-8")
+      const parsed: unknown = JSON.parse(fileContent)
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+        log.error(`File ${filePath} does not contain a valid JSON object`)
+        return false
+      }
+      // We've validated it's a non-null, non-array object, so it's safe to treat as Record
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      existingJson = parsed as Record<string, unknown>
+      log.debug(`Successfully read existing JSON from file: ${filePath}`)
+    } catch (error) {
+      if (error instanceof Error) {
+        log.error(`Failed to read file ${filePath}: ${error.message}`)
+      } else {
+        log.error(`Failed to read file ${filePath}`)
+      }
+      return false
+    }
+
+    // Merge user field into existing JSON
+    const updatedJson = {
+      ...existingJson,
+      user: validatedData.user,
+    }
+
+    // Write updated JSON back to file
+    try {
+      const jsonString = JSON.stringify(updatedJson, null, 2)
+      await fs.writeFile(filePath, jsonString, "utf-8")
+      log.debug(`Successfully updated user field in file: ${filePath}`)
+      return true
+    } catch (error) {
+      if (error instanceof Error) {
+        log.error(`Failed to write file ${filePath}: ${error.message}`)
+      } else {
+        log.error(`Failed to write file ${filePath}`)
+      }
+      return false
+    }
+  })
+}
+
+/**
+ * Safely writes a JavaScript object to a JSON file, validating it against a Zod schema
+ * and transforming Date objects to strings for serialization.
+ * This is a convenience wrapper around safeWriteJsonFile for data files.
+ *
+ * @param options - Configuration options for writing the data file
+ * @param options.filePath - Path to the JSON file to write (defaults to DEFAULT_DATA_FILE_PATH)
+ * @param options.data - The data object to write to the file
+ * @returns true if the write operation was successful, false otherwise.
+ */
+export async function safeWriteDataFile({
+  filePath = DEFAULT_DATA_FILE_PATH,
+  data,
+}: {
+  filePath?: string
+  data: DataFile
+}): Promise<boolean> {
+  return safeWriteJsonFile({
+    filePath,
+    data,
+    serializationSchema: DataFileSerializationSchema,
+  })
+}
+
+// =============================================================================
+// GENERIC FILE OPERATIONS (Consolidated from safe-settings-operations.ts)
+// =============================================================================
+
+/**
+ * Generic function to safely read and parse a JSON file with Zod validation.
+ * Handles file access errors, JSON parsing errors, and Zod validation errors.
+ *
+ * @param options - Configuration options for reading the file
+ * @param options.filePath - Path to the JSON file to read
+ * @param options.schema - Zod schema to validate against
+ * @param options.defaultValue - Default value to return on failure (optional)
+ * @returns The parsed and validated object, defaultValue, or undefined if parsing/validation fails.
+ */
+export async function safeReadJsonFile<T>({
+  filePath,
+  schema,
+  defaultValue,
+}: {
+  filePath: string
+  schema: z.ZodSchema<T>
+  defaultValue?: T
+}): Promise<T | undefined> {
+  log.debug(`Attempting to parse file: ${filePath}`)
+  let fileContent: string
+
+  // 1. Read the file content from the file system (synchronized to prevent race conditions)
+  try {
+    fileContent = await fileOperationsMutex.runExclusive(async () => {
+      return await fs.readFile(filePath, "utf-8")
+    })
+    log.debug(`Successfully read file: ${filePath}`)
+  } catch (error) {
+    if (error instanceof Error) {
+      log.info(`File ${filePath} not found or unreadable: ${error.message}`)
+    } else {
+      log.info(`File ${filePath} not found or unreadable`)
+    }
+    if (defaultValue !== undefined) {
+      log.info(`Using default value for ${filePath}`)
+      return defaultValue
+    }
+    return undefined
+  }
+
+  // 2. Parse the file content as JSON
+  let jsonData: unknown
+  try {
+    jsonData = JSON.parse(fileContent)
+    log.debug(`Successfully parsed JSON from file: ${filePath}`)
+  } catch (error) {
+    if (error instanceof Error) {
+      log.warn(`Failed to parse JSON from file ${filePath}: ${error.message}`)
+    } else {
+      log.warn(`Failed to parse JSON from file ${filePath}`)
+    }
+    if (defaultValue !== undefined) {
+      log.info(`Using default value for ${filePath}`)
+      return defaultValue
+    }
+    return undefined
+  }
+
+  // 3. Validate the parsed JSON against the Zod schema
+  try {
+    const parsedData = schema.parse(jsonData, { reportInput: true })
+    log.debug(`Successfully parsed and validated data from file: ${filePath}`)
+    return parsedData
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      log.warn(`Validation failed for file ${filePath}:`)
+      log.warn(JSON.stringify(error.issues, null, 2))
+    } else if (error instanceof Error) {
+      log.warn(
+        `An unexpected error occurred during validation for file ${filePath}: ${error.message}`,
+      )
+    } else {
+      log.warn(`An unknown error occurred during validation for file ${filePath}`)
+    }
+    if (defaultValue !== undefined) {
+      log.info(`Using default value for ${filePath}`)
+      return defaultValue
+    }
+    return undefined
+  }
+}
+
+/**
+ * Generic function to safely write an object to a JSON file with Zod validation and serialization.
+ * Handles Zod validation errors, JSON serialization errors, and file writing errors.
+ *
+ * @param options - Configuration options for writing the file
+ * @param options.filePath - Path to the JSON file to write
+ * @param options.data - The data object to write to the file
+ * @param options.serializationSchema - Zod schema for serialization transformation
+ * @returns true if the write operation was successful, false otherwise.
+ */
+export async function safeWriteJsonFile<T, S>({
+  filePath,
+  data,
+  serializationSchema,
+}: {
+  filePath: string
+  data: T
+  serializationSchema: z.ZodSchema<S>
+}): Promise<boolean> {
+  log.debug(`Attempting to write data to file: ${filePath}`)
+
+  let serializedData: S
+
+  // 1. Validate and transform the application data to the serialization format
+  try {
+    serializedData = serializationSchema.parse(data, { reportInput: true })
+    log.debug(`Data successfully validated and transformed for serialization for file: ${filePath}`)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      log.error(`Data validation/transformation failed before writing to file ${filePath}:`)
+      log.error(JSON.stringify(error.issues, null, 2))
+    } else if (error instanceof Error) {
+      log.error(
+        `An unexpected error occurred during data validation/transformation before writing to file ${filePath}: ${error.message}`,
+      )
+    } else {
+      log.error(
+        `An unknown error occurred during data validation/transformation before writing to file ${filePath}`,
+      )
+    }
+    return false
+  }
+
+  // 2. Serialize the transformed data to a JSON string
+  let jsonString: string
+  try {
+    jsonString = JSON.stringify(serializedData, null, 2) // Use 2-space indentation for readability
+    log.debug(`Data successfully serialized to JSON string for file: ${filePath}`)
+  } catch (error) {
+    if (error instanceof Error) {
+      log.error(`Failed to serialize data to JSON for file ${filePath}: ${error.message}`)
+    } else {
+      log.error(`An unknown error occurred while serializing data to JSON for file ${filePath}`)
+    }
+    return false
+  }
+
+  // 3. Write the JSON string to the file (synchronized to prevent data corruption)
+  return await fileOperationsMutex.runExclusive(async () => {
+    try {
+      await fs.writeFile(filePath, jsonString, "utf-8")
+      log.debug(`Successfully wrote data to file: ${filePath}`)
+      return true
+    } catch (error) {
+      if (error instanceof Error) {
+        log.error(`Failed to write file ${filePath}: ${error.message}`)
+      } else {
+        log.error(`An unknown error occurred while writing file ${filePath}`)
+      }
+      return false
+    }
+  })
+}
+
+/**
+ * Saves a base64 encoded image to the assets/avatar directory
+ *
+ * @param base64Data - Base64 encoded string (without data URL prefix)
+ * @param mimeType - MIME type of the image (e.g., "image/png")
+ * @returns The relative file path (e.g., "avatar/uuid.png") or null if failed
+ */
+export async function saveBase64ToAvatarFile(
+  base64Data: string,
+  mimeType: string,
+): Promise<string | null> {
+  try {
+    // Extract file extension from MIME type
+    const extensionMap: Record<string, string> = {
+      "image/png": "png",
+      "image/jpeg": "jpg",
+      "image/jpg": "jpg",
+      "image/gif": "gif",
+      "image/webp": "webp",
+    }
+
+    const extension = extensionMap[mimeType.toLowerCase()]
+    if (!extension) {
+      log.error(`Unsupported MIME type for avatar: ${mimeType}`)
+      return null
+    }
+
+    // Generate unique filename
+    const filename = `${uuidv4()}.${extension}`
+    const relativePath = `${DEFAULT_AVATAR_DIR}/${filename}`
+
+    // Create full path using data directory structure
+    const dataDir = path.join(process.cwd(), DEFAULT_DATA_DIR)
+    const avatarDir = path.join(dataDir, DEFAULT_AVATAR_DIR)
+    const fullPath = path.join(avatarDir, filename)
+
+    // Ensure avatar directory exists
+    await fs.mkdir(avatarDir, { recursive: true })
+
+    // Convert base64 to buffer and save
+    const buffer = Buffer.from(base64Data, "base64")
+
+    await fileOperationsMutex.runExclusive(async () => {
+      await fs.writeFile(fullPath, buffer)
+    })
+
+    log.debug(`Successfully saved avatar to: ${relativePath}`)
+    return relativePath
+  } catch (error) {
+    if (error instanceof Error) {
+      log.error(`Failed to save avatar file: ${error.message}`)
+    } else {
+      log.error("Unknown error occurred while saving avatar file")
+    }
+    return null
+  }
+}
