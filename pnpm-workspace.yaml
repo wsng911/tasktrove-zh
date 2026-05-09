@@ -7,7 +7,7 @@ packages:
 catalog:
   "@atlaskit/pragmatic-drag-and-drop-auto-scroll": ^2.1.2
   "@atlaskit/pragmatic-drag-and-drop-hitbox": ^1.1.0
-  "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": ^3.2.7
+  "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": ^3.2.15
   "@atlaskit/pragmatic-drag-and-drop": 1.7.7
   "@capacitor/android": ^7.4.4
   "@capacitor/app-launcher": ^7.0.2
