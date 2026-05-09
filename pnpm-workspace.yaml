@@ -107,7 +107,7 @@ catalog:
   electron: ^38.2.0
   embla-carousel-react: ^8.6.0
   esbuild: ^0.25.11
-  eslint-config-next: ^16.0.10
+  eslint-config-next: ^16.2.6
   eslint-config-prettier: ^10.1.1
   eslint-config-turbo: ^2.5.8
   eslint-plugin-only-warn: ^1.1.0
