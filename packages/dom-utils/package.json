@@ -1,0 +1,53 @@
+{
+  "name": "@tasktrove/dom-utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./audio": "./src/audio.ts",
+    "./toast": "./src/toast.ts",
+    "./notifications": "./src/notifications.ts",
+    "./keyboard": "./src/keyboard.ts",
+    "./type-safe-dom": "./src/type-safe-dom.ts",
+    "./drag-and-drop": "./src/drag-and-drop.ts",
+    "./scheduled-timeout": "./src/scheduled-timeout.ts",
+    "./visibility": "./src/visibility.ts",
+    "./pwa": "./src/pwa.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck:base": "tsgo --noEmit",
+    "typecheck:pro": "tsgo --project tsconfig.pro.json --noEmit",
+    "typecheck": "pnpm typecheck:base && (test -f tsconfig.pro.json && pnpm typecheck:pro || true)",
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "check:pro": "pnpm typecheck:pro && pnpm lint",
+    "test": "node ../../scripts/run-vitest.mjs run --reporter=dot --no-coverage",
+    "test:watch": "node ../../scripts/run-vitest.mjs --watch"
+  },
+  "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "catalog:",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "catalog:",
+    "@tasktrove/types": "workspace:*",
+    "@tasktrove/constants": "workspace:*",
+    "date-fns": "catalog:",
+    "react": "catalog:",
+    "sonner": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@testing-library/jest-dom": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@typescript/native-preview": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

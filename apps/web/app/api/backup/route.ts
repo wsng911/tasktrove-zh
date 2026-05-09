@@ -1,0 +1,42 @@
+import { NextResponse } from "next/server"
+import { runBackup } from "@/lib/backup"
+import { withMutexProtection } from "@/lib/utils/api-mutex"
+import { withAuthentication } from "@/lib/middleware/auth"
+import { withApiVersion } from "@/lib/middleware/api-version"
+import { withApiLogging } from "@/lib/middleware/api-logger"
+import { ApiErrorCode } from "@tasktrove/types/api-errors"
+import type { ErrorResponse } from "@tasktrove/types/api-responses"
+import { API_ROUTES } from "@tasktrove/types/constants"
+
+async function createBackup() {
+  try {
+    console.log("Manual backup triggered via API...")
+    await runBackup()
+
+    return NextResponse.json({
+      success: true,
+      message: "Backup completed successfully",
+    })
+  } catch (error) {
+    console.error("Manual backup failed:", error)
+
+    const errorResponse: ErrorResponse = {
+      code: ApiErrorCode.BACKUP_FAILED,
+      error: "Backup failed",
+      message: error instanceof Error ? error.message : "Unknown error occurred during backup",
+    }
+
+    return NextResponse.json<ErrorResponse>(errorResponse, { status: 500 })
+  }
+}
+
+export const POST = withApiVersion(
+  withMutexProtection(
+    withAuthentication(
+      withApiLogging(createBackup, {
+        endpoint: API_ROUTES.BACKUP,
+        module: "api-v1-backup",
+      }),
+    ),
+  ),
+)

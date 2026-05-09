@@ -1,0 +1,178 @@
+{
+  "appearance": {
+    "colorScheme": {
+      "description": "Wählen Sie Hell, Dunkel oder folgen Sie der Systemeinstellung",
+      "label": "Wählen Sie Ihr Farbschema",
+      "title": "Farbschema"
+    }
+  },
+  "data": {
+    "autoBackup": {
+      "backupTime": {
+        "description": "Zeit für automatische Backups wählen",
+        "label": "Backup-Zeit"
+      },
+      "description": "Automatisch Backup-Dateien für Aufgaben und Projekte erstellen.",
+      "dockerNotice": {
+        "description": "In einer Docker-Umgebung werden Backup-Dateien in /app/data/backups innerhalb des Containers gespeichert. Stellen Sie sicher, dass Sie ein Volume mounten, um Backups zu persistieren.",
+        "guide": "Docker-Anleitung ansehen",
+        "title": "Docker-Umgebung"
+      },
+      "enable": {
+        "description": "Ihre Daten regelmäßig automatisch sichern",
+        "label": "Automatische Backups aktivieren"
+      },
+      "manualBackup": {
+        "button": "Jetzt manuell sichern"
+      },
+      "maxBackups": {
+        "description": "Ältere Backups werden automatisch gelöscht",
+        "label": "Maximale Anzahl zu behaltender Backups",
+        "noLimit": "Keine Begrenzung"
+      },
+      "title": "Automatisches Backup"
+    },
+    "taskImport": {
+      "description": "Aufgaben aus anderen Aufgabenverwaltungsanwendungen importieren.",
+      "step1": {
+        "description": "Klicken Sie auf einen Aufgabenverwaltungsdienst unten, um den Import-Assistenten zu öffnen. Folgen Sie den Anweisungen, um Ihre Daten zu exportieren und in das TaskTrove-Format zu konvertieren.",
+        "title": "Schritt 1: Ihre Daten exportieren"
+      },
+      "step2": {
+        "description": "Nach der Verwendung des obigen Import-Assistenten laden Sie eine JSON-Datei herunter. Laden Sie diese Datei hier hoch, um Ihre Aufgaben, Projekte und Etiketten in TaskTrove zu importieren.",
+        "important": {
+          "description": "Laden Sie nur die JSON-Datei hoch, die vom Import-Assistenten heruntergeladen wurde. Reguläre Exporte aus anderen Apps funktionieren nicht.",
+          "title": "Wichtig:"
+        },
+        "title": "Schritt 2: Konvertierte Datei hochladen"
+      },
+      "title": "Aufgaben-Import",
+      "upload": {
+        "button": "JSON-Datei hochladen",
+        "error": {
+          "title": "Upload-Fehler"
+        },
+        "success": {
+          "alreadyExisted": "{{items}} existierten bereits",
+          "imported": "{{items}} importiert",
+          "labels_one": "{{count}} Etikett",
+          "labels_other": "{{count}} Etiketten",
+          "noNewItems": "Keine neuen Elemente",
+          "projects_one": "{{count}} Projekt",
+          "projects_other": "{{count}} Projekte",
+          "tasks_one": "{{count}} Aufgabe",
+          "tasks_other": "{{count}} Aufgaben",
+          "title": "Import erfolgreich!"
+        },
+        "uploading": "Hochladen..."
+      }
+    }
+  },
+  "general": {
+    "apiToken": {
+      "description": "API-Token für programmatischen Zugriff generieren. Verwenden Sie dieses Token im Authorization-Header als 'Bearer YOUR_TOKEN', um API-Anfragen zu authentifizieren.",
+      "generate": "Token generieren",
+      "label": "API-Token",
+      "regenerate": "Token neu generieren",
+      "revoke": "Token widerrufen",
+      "title": "API",
+      "viewDocs": "API-Dokumentation anzeigen"
+    },
+    "audio": {
+      "soundEffects": {
+        "description": "Töne für Aufgabenabschluss, Benachrichtigungen und andere Interaktionen abspielen",
+        "label": "Soundeffekte"
+      },
+      "title": "Audio"
+    },
+    "defaultPage": {
+      "description": "Wählen Sie die Seite, die beim ersten Öffnen von TaskTrove angezeigt werden soll",
+      "label": "Beim Öffnen von TaskTrove anzeigen",
+      "title": "Standardseite"
+    },
+    "language": {
+      "description": "Anzeigesprache der Anwendung auswählen",
+      "label": "Sprache",
+      "title": "Sprache"
+    },
+    "links": {
+      "autoConvert": {
+        "description": "URLs in Aufgabentiteln automatisch zu anklickbaren Links konvertieren",
+        "label": "URLs automatisch zu Links konvertieren"
+      },
+      "title": "Links"
+    },
+    "popovers": {
+      "hoverOpen": {
+        "description": "Popovers beim Hovern öffnen lassen, zusätzlich zum Klicken",
+        "label": "Hover-Öffnung"
+      },
+      "title": "Popovers"
+    },
+    "startView": {
+      "all": {
+        "description": "Alle Ihre Aufgaben an einem Ort anzeigen",
+        "label": "Alle Aufgaben"
+      },
+      "completed": {
+        "description": "Abgeschlossene Aufgaben überprüfen",
+        "label": "Abgeschlossen"
+      },
+      "inbox": {
+        "description": "Mit unorganisierten Aufgaben beginnen",
+        "label": "Posteingang"
+      },
+      "lastViewed": {
+        "description": "Zurück zu Ihrer letzten aktiven Seite",
+        "label": "Zuletzt angezeigt"
+      },
+      "today": {
+        "description": "Fokus auf heutige Aufgaben",
+        "label": "Heute"
+      },
+      "upcoming": {
+        "description": "Sehen, was als nächstes kommt",
+        "label": "Anstehend"
+      }
+    }
+  },
+  "notifications": {
+    "alerts": {
+      "notificationsBlocked": {
+        "manualInstructions": "Der Browser hat keinen Berechtigungsdialog angezeigt. Um Benachrichtigungen zu aktivieren, klicken Sie auf das 🔒-Symbol in der Adressleiste oder gehen Sie zu Browsereinstellungen → Datenschutz und Sicherheit → Website-Einstellungen → Benachrichtigungen und aktualisieren Sie dann die Seite.",
+        "retryInstructions": "Bitte versuchen Sie zuerst die Schaltfläche \"Wiederholen\". Wenn das nicht funktioniert, müssen Sie Benachrichtigungen manuell in Ihren Browsereinstellungen aktivieren.",
+        "title": "Benachrichtigungen blockiert"
+      },
+      "secureConnectionRequired": {
+        "description": "Benachrichtigungen erfordern eine sichere Verbindung (HTTPS) oder localhost. Bitte greifen Sie über HTTPS auf diese Website zu oder führen Sie sie auf localhost aus, um Benachrichtigungen zu aktivieren.",
+        "title": "Sichere Verbindung erforderlich"
+      }
+    },
+    "general": {
+      "enableNotifications": {
+        "description": "Alle Benachrichtigungen ein- oder ausschalten",
+        "label": "Benachrichtigungen aktivieren"
+      },
+      "requireInteraction": {
+        "description": "Benachrichtigungen bleiben sichtbar, bis Sie mit ihnen interagieren",
+        "label": "Interaktion erforderlich"
+      },
+      "title": "Allgemeine Einstellungen"
+    },
+    "permissionStatus": {
+      "blocked": "Blockiert",
+      "browserNotifications": "Browser-Benachrichtigungen",
+      "browserSettingsTooltip": "Browser erfordert möglicherweise manuelle Einstellungsänderungen",
+      "enable": "Aktivieren",
+      "enabled": "Aktiviert",
+      "notEnabled": "Nicht aktiviert",
+      "requesting": "Anfragend",
+      "requiresHttps": "Benachrichtigungen erfordern HTTPS",
+      "retry": "Wiederholen",
+      "retryTooltip": "Berechtigung erneut anfordern",
+      "testNotification": "Benachrichtigung testen",
+      "title": "Berechtigungsstatus",
+      "tryAgain": "Erneut versuchen"
+    }
+  }
+}
