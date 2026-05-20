@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { Toaster } from "@/components/ui/custom/toaster"
@@ -7,17 +6,9 @@ import { getLanguage } from "@/lib/i18n/server"
 import { HalloweenTheme } from "./components/halloween-theme"
 import { HalloweenProvider } from "./contexts/halloween-context"
 
-export const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-})
+export const inter = { variable: "--font-sans" }
 
-export const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-})
+export const jetbrainsMono = { variable: "--font-mono" }
 
 export const metadata: Metadata = {
   title: "TaskTrove",
